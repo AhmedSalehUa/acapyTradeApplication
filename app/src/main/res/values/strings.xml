@@ -1,0 +1,88 @@
+<resources>
+    <string name="app_name">Acapy Trade</string>
+    <string name="MainActivity">Home</string>
+    <string name="AddOrder">Add Order</string>
+    <string name="pending_request">Pending Request</string>
+    <string name="action_save">Save</string>
+    <string name="action_delete">Delete</string>
+    <string name="pending_requests">Pending Requests</string>
+    <string name="nav_bot_order">Orders</string>
+    <string name="nav_bot_messege">Messeges</string>
+    <string name="login">Login</string>
+    <string name="login_email_address">UserName</string>
+    <string name="login_password">Password</string>
+    <string name="login_log_btn">Login</string>
+
+    <!--    firebase-->
+    <string name="log_token">Log Token</string>
+    <string name="default_notification_channel_name" translatable="true">Weather</string>
+    <string name="msg_subscribe_failed">Failed to subscribe to weather topic</string>
+    <string name="fcm_message">FCM Message</string>
+    <string name="msg_subscribed">Subscribed to weather topic</string>
+    <string name="msg_token_fmt" translatable="false">InstanceID Token: %s</string>
+    <string name="default_notification_channel_id" translatable="false">fcm_default_channel</string>
+
+    <!--    orders-->
+
+    <string name="order_id_mock" translatable="false"># 1234–5678</string>
+    <string name="price_mock" translatable="false">$25</string>
+    <string name="requests_count_mock" translatable="false">5</string>
+    <string name="requests_count_badge" translatable="false">نوع الصيانة</string>
+    <string name="weight_mock" translatable="false">0</string>
+    <string name="weight_badge" translatable="false">تحصيل مبلغ</string>
+    <string name="pledge_mock" translatable="false">$150</string>
+    <string name="pledge_badge" translatable="false">مرافقين</string>
+    <string name="sender_badge" translatable="false">المكان</string>
+    <string name="client_name_mock" translatable="false">Edward Norton</string>
+    <string name="rating_mock" translatable="false">(26)</string>
+    <string name="from_badge" translatable="false">FROM</string>
+    <string name="to_badge" translatable="false">TO</string>
+    <string name="delivery_date_badge" translatable="false">DELIVERY DATE</string>
+    <string name="delivery_time_mock" translatable="false">6:30 pm</string>
+    <string name="delivery_date_mock" translatable="false">May 16, 2016</string>
+    <string name="deadline_badge" translatable="false">REQUEST DEADLINE</string>
+    <string name="deadline_time_mock" translatable="false">24 minutes</string>
+    <string name="request_btn_text" translatable="false">حذف</string>
+    <string name="btn_annotation_mock" translatable="false">5 people have sent a request</string>
+    <string name="content_from1_mock">W 90th St</string>
+    <string name="content_from2_mock">New York, NY 10025</string>
+    <string name="content_to1_mock">46th Ave</string>
+    <string name="content_to2_mock">Woodside, NY 11101</string>
+
+    <!--    add order-->
+
+    <string name="addorder_user">User</string>
+    <string name="addOrder_place">Place</string>
+    <string name="addOrder_location">Location</string>
+    <string name="addOrder_fix">نوع الزيارة</string>
+    <string name="addOrder_dliverCost">Amount</string>
+    <string name="addOrder_date">Date</string>
+    <string name="addOrder_time">time</string>
+    <string name="Num_of_matter">Number of Matter</string>
+    <string name="addOrder_file">File Name</string>
+    <string name="addOrder_Notes">Notes</string>
+    <string name="remove">delete</string>
+    <string name="nav_bot_location">Location</string>
+    <string name="done_orders">Finished</string>
+    <string name="deleted_order">Deleted Orders</string>
+    <string name="finished_orders">Finished Orders</string>
+    <string name="deleted_orders">Deleted Orders</string>
+    <string name="addOrder_progress">Progress</string>
+    <string name="addOrder_item">add progress item</string>
+    <string name="request_btn_note_text">اضافة ملاحظة</string>
+    <string name="request_btn_pen_text">تاجيل</string>
+    <string name="request_btn_save_text">تفعيل</string>
+    <string name="lef_nav_home">الرئيسية</string>
+    <string name="lef_nav_cost">مصاريف يومية</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="cost_amount">المبلغ</string>
+    <string name="cost_name">انتقالات</string>
+    <string name="cost_details">التفاصيل</string>
+    <string name="cost_date">التاريخ</string>
+    <string name="cost_num">رقم الاوردر</string>
+    <string name="date_from">الفترة من</string>
+    <string name="date_to">الفترة الى</string>
+    <string name="show">عرض</string>
+</resources>
