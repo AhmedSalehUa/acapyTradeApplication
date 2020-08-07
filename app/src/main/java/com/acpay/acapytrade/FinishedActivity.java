@@ -15,10 +15,12 @@ import androidx.loader.app.LoaderManager;
 import androidx.loader.content.Loader;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.acpay.acapytrade.floadingCell.FoldingCell;
-import com.acpay.acapytrade.oreder.Order;
-import com.acpay.acapytrade.oreder.OrderAdapter;
-import com.acpay.acapytrade.oreder.OrderLoader;
+import com.acpay.acapytrade.FloadingCell.FoldingCell;
+import com.acpay.acapytrade.Navigations.OrderDeleted;
+import com.acpay.acapytrade.Navigations.OrderFinished;
+import com.acpay.acapytrade.Order.Order;
+import com.acpay.acapytrade.Order.OrderAdapter;
+import com.acpay.acapytrade.Order.OrderLoader;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,46 +31,13 @@ public class FinishedActivity extends AppCompatActivity implements LoaderManager
     OrderAdapter adapter;
     TextView State;
     ProgressBar Loding;
-    LoaderManager loaderManager;
-    private static final int ORDER_LOADER_ID = 2;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.pending_activity);
-        final SwipeRefreshLayout pullToRefresh = findViewById(R.id.RequestpullToRefresh);
-        pullToRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                loaderManager.restartLoader(ORDER_LOADER_ID, null, FinishedActivity.this);
-                loaderManager.initLoader(ORDER_LOADER_ID, null, FinishedActivity.this);
-                pullToRefresh.setRefreshing(false);
-                Toast.makeText(FinishedActivity.this, "Updated", Toast.LENGTH_SHORT).show();
-            }
-        });
-        ListView theListView = findViewById(R.id.order_list_pending);
-
-        State = (TextView) findViewById(R.id.no_orders);
-        State.setText("Loading");
-        Loding = (ProgressBar) findViewById(R.id.lood_progress_pending);
-        theListView.setEmptyView(State);
-
-        loaderManager = getSupportLoaderManager();
-        loaderManager.initLoader(ORDER_LOADER_ID, null, FinishedActivity.this);
-
-        adapter = new OrderAdapter(this, new ArrayList<Order>(),2);
-
-
-        theListView.setAdapter(adapter);
-
-        theListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int pos, long l) {
-                ((FoldingCell) view).toggle(false);
-                adapter.registerToggle(pos);
-
-            }
-        });
+        getSupportFragmentManager().beginTransaction().replace(R.id.pending_container, new OrderFinished()).commit();
     }
 
     @NonNull

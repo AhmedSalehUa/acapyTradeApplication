@@ -1,4 +1,4 @@
-package com.acpay.acapytrade.floadingCell.views;
+package com.acpay.acapytrade.FloadingCell.views;
 
 import android.content.Context;
 import android.util.AttributeSet;

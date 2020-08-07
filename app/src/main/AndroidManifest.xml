@@ -3,8 +3,8 @@
     package="com.acpay.acapytrade">
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/appbackground"
@@ -40,8 +40,7 @@
             android:theme="@style/AppTheme.NoActionBar"
             android:label="@string/MainActivity"/>
         <activity
-            android:name=".AddOrderActivity"
-            android:label="@string/AddOrder"
+            android:name=".AddOrEditeOrderActivity"
             android:theme="@style/EditorTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -96,6 +95,7 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </receiver>
+        <service android:name=".BackgroundMessegesReciver.BackgroundMessegesReciver"/>
     </application>
 
 </manifest>
