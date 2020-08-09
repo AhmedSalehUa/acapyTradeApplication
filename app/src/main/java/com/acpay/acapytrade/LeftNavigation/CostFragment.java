@@ -1,4 +1,4 @@
-package com.acpay.acapytrade.Navigations;
+package com.acpay.acapytrade.LeftNavigation;
 
 import android.app.DatePickerDialog;
 import android.os.Bundle;

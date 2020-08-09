@@ -9,16 +9,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.IBinder;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 
 import com.acpay.acapytrade.MainActivity;
-
-
-import com.acpay.acapytrade.Navigations.messages.Message;
 import com.acpay.acapytrade.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -104,7 +100,7 @@ public class BackgroundMessegesReciver extends Service {
             notificationManager.createNotificationChannel(channel);
         }
 
-        notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());
+        notificationManager.notify(0  , notificationBuilder.build());
     }
 
     @Override
@@ -117,10 +113,10 @@ public class BackgroundMessegesReciver extends Service {
                 0, notificationIntent, 0);
 
         Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
-                .setContentTitle("Acapy Member")
+                .setContentTitle("Acapy Trade")
                 .setContentText("")
                 .setContentText(input)
-                .setSmallIcon(R.drawable.ic_launcher_background)
+                .setSmallIcon(R.drawable.appbackground)
                 .setContentIntent(pendingIntent)
                 .build();
         startForeground(2, notification);

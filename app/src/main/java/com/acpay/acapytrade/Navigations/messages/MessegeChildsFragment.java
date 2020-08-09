@@ -248,22 +248,14 @@ public class MessegeChildsFragment extends Fragment {
             @Override
             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
                 Message message = snapshot.getValue(Message.class);
-                if (message.getName() == mUsername) {
 
-                } else {
-                    notifyME(message.getName(), message.getText());
-                }
                 mMessageAdapter.add(message);
             }
 
             @Override
             public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
                 Message message = snapshot.getValue(Message.class);
-                if (message.getName() == mUsername) {
 
-                } else {
-                    notifyME(message.getName(), message.getText());
-                }
 
             }
 

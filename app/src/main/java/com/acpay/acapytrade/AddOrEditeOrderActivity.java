@@ -28,6 +28,9 @@ import com.acpay.acapytrade.Networking.JasonReponser;
 import com.acpay.acapytrade.Order.Order;
 import com.acpay.acapytrade.Order.orderReponser;
 import com.acpay.acapytrade.Order.progressReponser;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -41,10 +44,15 @@ import java.util.List;
 public class AddOrEditeOrderActivity extends AppCompatActivity {
     String actionType;
 
+    private FirebaseDatabase mFirebaseDatabase;
+    private DatabaseReference mDatabaseReference;
+    private ChildEventListener mChildEventListener;
+
     private int mYear, mMonth, mDay, mHour, mMinute;
     private Spinner userIdSpinner;
     private String userId = "0";
     private String userName = "";
+    private String OrderUserName = "";
     String TokenList = "";
     EditText place, location, date, time, matter, files, notes, fixtrype, dlivercost;
     EditText pickedDate, pickedTime, addProgTex;
@@ -63,7 +71,8 @@ public class AddOrEditeOrderActivity extends AppCompatActivity {
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
         Intent data = getIntent();
         idUpdated = data.getStringExtra("id");
-
+        mFirebaseDatabase = FirebaseDatabase.getInstance();
+        mDatabaseReference = mFirebaseDatabase.getReference().child("orders");
         userIdSpinner = (Spinner) findViewById(R.id.spinner_gender);
         place = (EditText) findViewById(R.id.addorder_place);
         location = (EditText) findViewById(R.id.addorder_location);
@@ -227,19 +236,21 @@ public class AddOrEditeOrderActivity extends AppCompatActivity {
                     if (selection.equals("Ahmed")) {
                         userId = s[0];
                         userName = "Ahmed";
-                        Log.w("Ahmed", userId);
+                        OrderUserName = userId;
+
                     } else if (selection.equals("Mohamed")) {
                         userId = s[1];
                         userName = "Mohamed";
-                        Log.w("Mohamed", userId);
+                        OrderUserName = userId;
                     } else if (selection.equals("Remon")) {
                         userId = s[2];
                         userName = "Remon";
-                        Log.w("Remon", userId);
+                        OrderUserName = userId;
+
                     } else if (selection.equals("George")) {
                         userId = s[3];
                         userName = "George";
-                        Log.w("George", userId);
+                        OrderUserName = userId;
                     }
                 }
             }
@@ -294,6 +305,9 @@ public class AddOrEditeOrderActivity extends AppCompatActivity {
                                             if (updateProgress.isFinish()) {
                                                 String res = updateProgress.getUserId();
                                                 if (!res.equals("0")) {
+
+                                                    mDatabaseReference.child(OrderUserName).push().setValue("new" + dateVal);
+
                                                     Toast.makeText(AddOrEditeOrderActivity.this, "Saved", Toast.LENGTH_LONG).show();
                                                     startActivity(new Intent(AddOrEditeOrderActivity.this, MainActivity.class));
                                                 } else {

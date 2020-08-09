@@ -91,4 +91,7 @@
     <string name="content_description_end_icon">ملاحظات</string>
     <string name="request_btn_cost_text">تفعيل</string>
     <string name="request_btn_edite">تعديل</string>
+    <string name="left_nav_group">Other</string>
+    <string name="lef_nav_ip">ip search</string>
+    <string name="lef_nav_notes">Notes</string>
 </resources>

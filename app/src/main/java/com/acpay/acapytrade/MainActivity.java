@@ -9,20 +9,20 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import android.Manifest;
+import android.app.ActivityManager;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
 import com.acpay.acapytrade.BackgroundMessegesReciver.BackgroundMessegesReciver;
-import com.acpay.acapytrade.Navigations.CostFragment;
+import com.acpay.acapytrade.LeftNavigation.CostFragment;
+import com.acpay.acapytrade.LeftNavigation.ip.IpSearchFragment;
 import com.acpay.acapytrade.Navigations.HomeFragment;
 import com.acpay.acapytrade.Navigations.Locations.LocationFragment;
-import com.acpay.acapytrade.Navigations.OrderDeleted;
-import com.acpay.acapytrade.Navigations.messages.MessegeChildsFragment;
 import com.acpay.acapytrade.Navigations.messages.MessegeFragment;
 import com.acpay.acapytrade.Navigations.OrderFragment;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -44,28 +44,28 @@ import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 import java.util.Arrays;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity  implements NavigationView.OnNavigationItemSelectedListener{
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     private BottomNavigationView bottomNav;
     NavigationView navigationView;
     private DrawerLayout drawer;
     FirebaseUser user;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Dexter.withActivity(this).withPermissions(Arrays.asList(Manifest.permission.FOREGROUND_SERVICE,Manifest.permission.ACCESS_FINE_LOCATION)).withListener(new MultiplePermissionsListener() {
+        Dexter.withActivity(this).withPermissions(Arrays.asList(Manifest.permission.FOREGROUND_SERVICE, Manifest.permission.ACCESS_WIFI_STATE, Manifest.permission.ACCESS_FINE_LOCATION)).withListener(new MultiplePermissionsListener() {
             @Override
             public void onPermissionsChecked(MultiplePermissionsReport report) {
-                Log.e("permission ok","ok");
+                Log.e("permission ok", "ok");
             }
 
             @Override
             public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
-                Snackbar.make(findViewById(android.R.id.content),"Permissions Denied", Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(findViewById(android.R.id.content), "Permissions Denied", Snackbar.LENGTH_SHORT).show();
             }
         }).check();
-        Intent serviceIntent = new Intent(this, BackgroundMessegesReciver.class);
-        ContextCompat.startForegroundService(this, serviceIntent);
+        startService();
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -115,6 +115,26 @@ public class MainActivity extends AppCompatActivity  implements NavigationView.O
                     }
                 });
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new OrderFragment()).commit();
+
+    }
+
+    public void startService() {
+        if (isMyServiceRunning(BackgroundMessegesReciver.class)) {
+
+        } else {
+            Intent serviceIntent = new Intent(this, BackgroundMessegesReciver.class);
+            ContextCompat.startForegroundService(this, serviceIntent);
+        }
+    }
+
+    private boolean isMyServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -128,9 +148,9 @@ public class MainActivity extends AppCompatActivity  implements NavigationView.O
         if (bottomNav.getSelectedItemId() != R.id.nav_bot_order) {
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new OrderFragment()).commit();
             bottomNav.setSelectedItemId(R.id.nav_bot_order);
-        }else if (drawer.isDrawerOpen(GravityCompat.START)) {
+        } else if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
-        }else {
+        } else {
             Intent intent = new Intent(Intent.ACTION_MAIN);
             intent.addCategory(Intent.CATEGORY_HOME);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -180,10 +200,31 @@ public class MainActivity extends AppCompatActivity  implements NavigationView.O
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new CostFragment()).commit();
                 bottomNav.setVisibility(View.INVISIBLE);
                 break;
+            case R.id.lef_nav_ip:
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new IpSearchFragment()).commit();
+                bottomNav.setVisibility(View.INVISIBLE);
+                break;
+            case R.id.lef_nav_notes:
+                Snackbar.make(findViewById(android.R.id.content), "Soon", BaseTransientBottomBar.LENGTH_SHORT).show();
+//                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new NotesFragment()).commit();
+//                bottomNav.setVisibility(View.INVISIBLE);
+                break;
 
         }
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
-
+//
+//    private boolean serviceIsRunningInForeGround(String serviceClassName) {
+//        Log.e("asassasasa","started");
+//        final ActivityManager activityManager = (ActivityManager) getApplicationContext().getSystemService(Context.ACTIVITY_SERVICE);
+//        final List<ActivityManager.RunningServiceInfo> services = activityManager.getRunningServices(Integer.MAX_VALUE);
+//
+//        for (ActivityManager.RunningServiceInfo runningServiceInfo : services) {
+//            if (runningServiceInfo.service.getClassName().equals(serviceClassName)){
+//                return true;
+//            }
+//        }
+//        return false;
+//    }
 }
