@@ -1,5 +1,6 @@
 package com.acpay.acapytrade;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,21 +19,24 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.acpay.acapytrade.BackgroundMessegesReciver.BackgroundMessegesReciver;
 import com.acpay.acapytrade.LeftNavigation.CostFragment;
 import com.acpay.acapytrade.LeftNavigation.ip.IpSearchFragment;
 import com.acpay.acapytrade.Navigations.HomeFragment;
 import com.acpay.acapytrade.Navigations.Locations.LocationFragment;
+import com.acpay.acapytrade.Navigations.messages.MessegeChildsFragment;
 import com.acpay.acapytrade.Navigations.messages.MessegeFragment;
 import com.acpay.acapytrade.Navigations.OrderFragment;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.badge.BadgeDrawable;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 import com.karumi.dexter.Dexter;
@@ -42,6 +46,7 @@ import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -49,11 +54,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     NavigationView navigationView;
     private DrawerLayout drawer;
     FirebaseUser user;
+    String token;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         Dexter.withActivity(this).withPermissions(Arrays.asList(Manifest.permission.FOREGROUND_SERVICE, Manifest.permission.ACCESS_WIFI_STATE, Manifest.permission.ACCESS_FINE_LOCATION)).withListener(new MultiplePermissionsListener() {
             @Override
             public void onPermissionsChecked(MultiplePermissionsReport report) {
@@ -65,7 +72,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 Snackbar.make(findViewById(android.R.id.content), "Permissions Denied", Snackbar.LENGTH_SHORT).show();
             }
         }).check();
-        startService();
+
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -95,7 +102,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 return true;
             }
         });
-
+        BadgeDrawable bage = bottomNav.getOrCreateBadge(R.id.nav_bot_messege);
+        bage.setVisible(true);
+        bage.setNumber(5);
         FirebaseInstanceId.getInstance().getInstanceId()
                 .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
                     @Override
@@ -106,35 +115,46 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         }
 
                         // Get new Instance ID token
-                        String token = task.getResult().getToken();
+                        token = task.getResult().getToken();
 
                         // Log and toast
                         String msg = getString(R.string.msg_token_fmt, token);
                         Log.d("token", token);
-                        // Toast.makeText(MainActivity.this, msg, Toast.LENGTH_SHORT).show();
+
                     }
                 });
-        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new OrderFragment()).commit();
-
-    }
-
-    public void startService() {
-        if (isMyServiceRunning(BackgroundMessegesReciver.class)) {
-
-        } else {
-            Intent serviceIntent = new Intent(this, BackgroundMessegesReciver.class);
-            ContextCompat.startForegroundService(this, serviceIntent);
-        }
-    }
-
-    private boolean isMyServiceRunning(Class<?> serviceClass) {
-        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-            if (serviceClass.getName().equals(service.service.getClassName())) {
-                return true;
+        Intent noty = this.getIntent();
+        String type = noty.getStringExtra("type");
+        if (type != null) {
+            if (type.equals("notification")) {
+                bottomNav.setSelectedItemId(R.id.nav_bot_messege);
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new MessegeChildsFragment(noty.getStringExtra("sender"))).commit();
             }
+        } else {
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new OrderFragment()).commit();
         }
-        return false;
+
+
+        OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
+            @Override
+            public void handleOnBackPressed() {
+
+                if (bottomNav.getSelectedItemId() != R.id.nav_bot_order) {
+                    getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new OrderFragment()).commit();
+                    bottomNav.setSelectedItemId(R.id.nav_bot_order);
+                } else if (drawer.isDrawerOpen(GravityCompat.START)) {
+                    drawer.closeDrawer(GravityCompat.START);
+                } else {
+                    Intent intent = new Intent(Intent.ACTION_MAIN);
+                    intent.addCategory(Intent.CATEGORY_HOME);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                }
+            }
+        };
+        this.getOnBackPressedDispatcher().addCallback(this, callback);
+
+
     }
 
     @Override
@@ -143,20 +163,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onDestroy();
     }
 
-    @Override
-    public void onBackPressed() {
-        if (bottomNav.getSelectedItemId() != R.id.nav_bot_order) {
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new OrderFragment()).commit();
-            bottomNav.setSelectedItemId(R.id.nav_bot_order);
-        } else if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            Intent intent = new Intent(Intent.ACTION_MAIN);
-            intent.addCategory(Intent.CATEGORY_HOME);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(intent);
-        }
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -214,17 +220,31 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
-//
-//    private boolean serviceIsRunningInForeGround(String serviceClassName) {
-//        Log.e("asassasasa","started");
-//        final ActivityManager activityManager = (ActivityManager) getApplicationContext().getSystemService(Context.ACTIVITY_SERVICE);
-//        final List<ActivityManager.RunningServiceInfo> services = activityManager.getRunningServices(Integer.MAX_VALUE);
-//
-//        for (ActivityManager.RunningServiceInfo runningServiceInfo : services) {
-//            if (runningServiceInfo.service.getClassName().equals(serviceClassName)){
-//                return true;
-//            }
-//        }
-//        return false;
-//    }
+
+    private void status(String status) {
+
+        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (user.getDisplayName().equals("Ahmed Saleh")) {
+
+        } else {
+            String token = this.getIntent().getStringExtra("token");
+            DatabaseReference mDatabaseReference = FirebaseDatabase.getInstance().getReference("users").child(firebaseUser.getDisplayName());
+            mDatabaseReference.removeValue();
+            User Fireuser = new User(firebaseUser.getDisplayName(), firebaseUser.getUid(), token, status);
+            mDatabaseReference.push().setValue(Fireuser);
+        }
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        status("online");
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        status("offline");
+    }
 }

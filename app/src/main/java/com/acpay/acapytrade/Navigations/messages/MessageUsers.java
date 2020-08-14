@@ -18,7 +18,6 @@ package com.acpay.acapytrade.Navigations.messages;
 public class MessageUsers {
 
     private String name;
-
     public MessageUsers() {
     }
 
@@ -33,5 +32,6 @@ public class MessageUsers {
     public void setName(String name) {
         this.name = name;
     }
+
 
 }

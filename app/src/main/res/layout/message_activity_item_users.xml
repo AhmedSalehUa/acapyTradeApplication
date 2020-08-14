@@ -2,6 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="80dp"
+    android:id="@+id/userLatout"
+
     android:orientation="horizontal">
 
     <RelativeLayout
@@ -23,6 +25,7 @@
             android:textAllCaps="true"
             android:textColor="@android:color/black"
             android:textSize="25sp" />
+
     </RelativeLayout>
 
     <RelativeLayout
@@ -36,5 +39,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true" />
+
+        <TextView
+            android:id="@+id/last_msg"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/message_user_name" />
     </RelativeLayout>
 </LinearLayout>

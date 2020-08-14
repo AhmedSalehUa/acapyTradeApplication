@@ -20,7 +20,8 @@ import java.util.List;
 
 public class MessageAdapter extends ArrayAdapter<Message> {
     String userName;
-
+    TextView authorTextView;
+    ImageView seen;
     public MessageAdapter(Context context, int resource, List<Message> objects, String userName) {
         super(context, resource, objects);
         this.userName = userName;
@@ -29,17 +30,29 @@ public class MessageAdapter extends ArrayAdapter<Message> {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+        Message message = getItem(position);
         if (convertView == null) {
-            convertView = ((Activity) getContext()).getLayoutInflater().inflate(R.layout.message_activity_item, parent, false);
+            if (message.getName().equals(userName)) {
+                convertView = ((Activity) getContext()).getLayoutInflater().inflate(R.layout.message_activity_item_sender, parent, false);
+                seen = (ImageView)convertView.findViewById(R.id.message_status);
+                if (message.isSeen()){
+                    seen.setImageResource(R.drawable.seen2);
+                }else {
+                    seen.setImageResource(R.drawable.delivered);
+                }
+            } else {
+                convertView = ((Activity) getContext()).getLayoutInflater().inflate(R.layout.message_activity_item_reciver, parent, false);
+                authorTextView = (TextView) convertView.findViewById(R.id.nameTextView);
+                authorTextView.setText(message.getName());
+            }
         }
 
         ImageView photoImageView = (ImageView) convertView.findViewById(R.id.photoImageView);
         TextView messageTextView = (TextView) convertView.findViewById(R.id.messageTextView);
-        TextView authorTextView = (TextView) convertView.findViewById(R.id.nameTextView);
+
         TextView dateTextView = (TextView) convertView.findViewById(R.id.dateTextView);
         TextView timeTextView = (TextView) convertView.findViewById(R.id.timeTextView);
 
-        Message message = getItem(position);
 
         boolean isPhoto = message.getPhotoUrl() != null;
         if (isPhoto) {
@@ -56,25 +69,8 @@ public class MessageAdapter extends ArrayAdapter<Message> {
 
         dateTextView.setText(message.getDate());
         timeTextView.setText(message.getTime());
-        LinearLayout linearLayout = (LinearLayout) convertView.findViewById(R.id.massege_container);
-        if (message.getName().equals(userName)) {
-            authorTextView.setText(message.getName());
-            linearLayout.setBackground(getContext().getResources().getDrawable(R.drawable.shape_bg_outgoing_bubble));
-            authorTextView.setTextColor(getContext().getResources().getColor(R.color.massegeMeSender));
-            dateTextView.setTextColor(getContext().getResources().getColor(R.color.massegeMeSender));
-            timeTextView.setTextColor(getContext().getResources().getColor(R.color.massegeMeSender));
-            linearLayout.setGravity(Gravity.RIGHT);
 
-        } else {
-            authorTextView.setText(message.getName());
-            linearLayout.setBackground(getContext().getResources().getDrawable(R.drawable.shape_bg_incoming_bubble));
-            authorTextView.setTextColor(getContext().getResources().getColor(R.color.massegeToSender));
-            dateTextView.setTextColor(getContext().getResources().getColor(R.color.massegeToSender));
-            timeTextView.setTextColor(getContext().getResources().getColor(R.color.massegeToSender));
 
-            linearLayout.setGravity(Gravity.LEFT);
-
-        }
         return convertView;
     }
 }

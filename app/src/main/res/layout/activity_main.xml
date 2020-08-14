@@ -17,8 +17,8 @@
             android:layout_height="?attr/actionBarSize"
             android:background="@color/colorPrimary"
             android:elevation="4dp"
-            android:theme="@style/AppTheme.NoActionBar"
-            app:titleTextColor="#000" />
+            android:theme="@style/custom"
+            app:titleTextColor="#fff" />
 
         <RelativeLayout
             android:layout_width="match_parent"

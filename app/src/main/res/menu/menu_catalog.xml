@@ -7,7 +7,6 @@
 
     <item
         android:id="@+id/pending_request"
-
         android:title="@string/pending_request"
         app:showAsAction="never" />
     <item

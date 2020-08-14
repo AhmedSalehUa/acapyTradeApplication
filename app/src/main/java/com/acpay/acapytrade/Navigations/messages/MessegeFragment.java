@@ -13,6 +13,8 @@ import android.text.InputFilter;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -25,10 +27,12 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationCompat;
 import androidx.fragment.app.Fragment;
 
 import com.acpay.acapytrade.R;
+import com.acpay.acapytrade.User;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -65,7 +69,7 @@ public class MessegeFragment extends Fragment {
 
     public static final String ANONYMOUS = "anonymous";
     public static final int DEFAULT_MSG_LENGTH_LIMIT = 1000;
-
+    String theLastMessage;
     private ListView mUsersListView;
     private MessageUserAdapter mUsersMessageAdapter;
 
@@ -125,7 +129,16 @@ public class MessegeFragment extends Fragment {
                 getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new MessegeChildsFragment(user.getName())).commit();
             }
         });
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Contacts");
+        setHasOptionsMenu(true);
+
         return rootView;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        menu.clear();
     }
 
 
@@ -134,18 +147,20 @@ public class MessegeFragment extends Fragment {
     }
 
     private void attachDatabaseReadListener() {
-        DatabaseReference itemsRef = mDatabaseReference;
+        DatabaseReference itemsRef = mFirebaseDatabase.getReference().child("messages");
         ValueEventListener eventListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                for(DataSnapshot ds : dataSnapshot.getChildren()) {
+                for (DataSnapshot ds : dataSnapshot.getChildren()) {
+
                     MessageUsers user = new MessageUsers(ds.getKey());
                     mUsersMessageAdapter.add(user);
                 }
             }
 
             @Override
-            public void onCancelled(DatabaseError databaseError) {}
+            public void onCancelled(DatabaseError databaseError) {
+            }
         };
         itemsRef.addListenerForSingleValueEvent(eventListener);
     }
@@ -163,4 +178,3 @@ public class MessegeFragment extends Fragment {
     }
 
 }
-/**/

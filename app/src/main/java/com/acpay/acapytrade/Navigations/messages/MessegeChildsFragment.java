@@ -13,8 +13,11 @@ import android.text.InputFilter;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -24,9 +27,16 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationCompat;
 import androidx.fragment.app.Fragment;
 
+import com.acpay.acapytrade.Navigations.messages.sendNotification.APIService;
+import com.acpay.acapytrade.Navigations.messages.sendNotification.Client;
+import com.acpay.acapytrade.Navigations.messages.sendNotification.Data;
+import com.acpay.acapytrade.Navigations.messages.sendNotification.MyResponse;
+import com.acpay.acapytrade.Navigations.messages.sendNotification.Sender;
+import com.acpay.acapytrade.Navigations.messages.sendNotification.Token;
 import com.acpay.acapytrade.R;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -39,6 +49,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -48,19 +59,26 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MessegeChildsFragment extends Fragment {
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mDatabaseReference;
-
+    Token token;
 
     private FirebaseStorage mFirebaseStorage;
     private StorageReference mChatPhotosStorageReference;
     private ChildEventListener mChildEventListener;
-
+    FirebaseUser user;
     private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
+    ValueEventListener seenListener;
 
     private static final String TAG = "MessegeFragment";
 
@@ -79,10 +97,11 @@ public class MessegeChildsFragment extends Fragment {
 
     private static final int RC_PHOTO_PICKER = 2;
     public static final int RC_SIGN_IN = 1;
-
+    APIService apiService;
     private String targetUserName;
     String DateNow;
     String TimeNow;
+
     public MessegeChildsFragment(String username) {
         super();
         this.targetUserName = username;
@@ -98,8 +117,8 @@ public class MessegeChildsFragment extends Fragment {
         mFirebaseStorage = FirebaseStorage.getInstance();
         mDatabaseReference = mFirebaseDatabase.getReference().child("messages").child(targetUserName);
         mChatPhotosStorageReference = mFirebaseStorage.getReference().child("chat_photo");
-        FirebaseUser user = mFirebaseAuth.getCurrentUser();
-
+        user = mFirebaseAuth.getCurrentUser();
+        apiService = Client.getClient("https://fcm.googleapis.com/").create(APIService.class);
         mProgressBar = (ProgressBar) rootView.findViewById(R.id.progressBar);
         mMessageListView = (ListView) rootView.findViewById(R.id.messageListView);
         mPhotoPickerButton = (ImageButton) rootView.findViewById(R.id.photoPickerButton);
@@ -146,10 +165,11 @@ public class MessegeChildsFragment extends Fragment {
         mSendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                DateNow = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
-                TimeNow = new SimpleDateFormat("hh:mm").format(new Date());
-                Message friendlyMessage = new Message(mMessageEditText.getText().toString(), mUsername, null,DateNow,TimeNow);
+                DateNow = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH).format(new Date());
+                TimeNow = new SimpleDateFormat("hh:mm", Locale.ENGLISH).format(new Date());
+                Message friendlyMessage = new Message(mMessageEditText.getText().toString(), mUsername, null, DateNow, TimeNow, false);
                 mDatabaseReference.push().setValue(friendlyMessage);
+                sendNotifiaction(targetUserName, mUsername, mMessageEditText.getText().toString());
                 mMessageEditText.setText("");
             }
         });
@@ -178,7 +198,47 @@ public class MessegeChildsFragment extends Fragment {
         List<Message> friendlyMessages = new ArrayList<>();
         mMessageAdapter = new MessageAdapter(getContext(), R.layout.message_activity_item, friendlyMessages, user.getDisplayName());
         mMessageListView.setAdapter(mMessageAdapter);
+        mMessageListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                return false;
+            }
+        });
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Messages");
+        setHasOptionsMenu(true);
+        seenMessage();
         return rootView;
+    }
+
+    private void seenMessage() {
+        if (user.getDisplayName().equals("Ahmed Saleh")) {
+
+        } else {
+            seenListener = mDatabaseReference.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                        Message chat = snapshot.getValue(Message.class);
+                        if (!chat.getName().equals(mUsername)) {
+                            HashMap<String, Object> hashMap = new HashMap<>();
+                            hashMap.put("seen", true);
+                            snapshot.getRef().updateChildren(hashMap);
+                        }
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+        }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        menu.clear();
     }
 
     @Override
@@ -214,9 +274,10 @@ public class MessegeChildsFragment extends Fragment {
                                 @Override
                                 public void onSuccess(Uri uri) {
                                     String imageUrl = uri.toString();
-                                    DateNow = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
-                                    TimeNow = new SimpleDateFormat("hh:mm").format(new Date());
-                                    Message friendlyMessage = new Message(null, mUsername, imageUrl,DateNow,TimeNow);
+                                    DateNow = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH).format(new Date());
+                                    TimeNow = new SimpleDateFormat("hh:mm", Locale.ENGLISH).format(new Date());
+                                    Message friendlyMessage = new Message(null, mUsername, imageUrl, DateNow, TimeNow, false);
+                                    sendNotifiaction(targetUserName, mUsername, "photo");
                                     mDatabaseReference.push().setValue(friendlyMessage);
                                 }
                             });
@@ -313,4 +374,58 @@ public class MessegeChildsFragment extends Fragment {
 
     }
 
+    private void sendNotifiaction(String receiver, final String username, final String message) {
+
+        DatabaseReference tokens = FirebaseDatabase.getInstance().getReference("users").child(receiver);
+        ChildEventListener mChildEventListener = new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                token = snapshot.getValue(Token.class);
+
+                Data data = new Data(user.getDisplayName(), message);
+
+                Sender sender = new Sender(data, token.getToken());
+
+                apiService.sendNotification(sender)
+                        .enqueue(new Callback<MyResponse>() {
+                            @Override
+                            public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
+                                if (response.code() == 200) {
+                                    if (response.body().success != 1) {
+                                        Toast.makeText(getContext(), "Failed!", Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        Log.e("b", "ok");
+                                    }
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(Call<MyResponse> call, Throwable t) {
+
+                            }
+                        });
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                token = snapshot.getValue(Token.class);
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        };
+        tokens.addChildEventListener(mChildEventListener);
+    }
 }

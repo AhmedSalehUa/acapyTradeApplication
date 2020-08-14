@@ -1,10 +1,14 @@
 package com.acpay.acapytrade.LeftNavigation;
 
 import android.app.DatePickerDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.DatePicker;
@@ -12,11 +16,16 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
+import com.acpay.acapytrade.MainActivity;
+import com.acpay.acapytrade.Navigations.OrderFragment;
 import com.acpay.acapytrade.Networking.JasonReponser;
 import com.acpay.acapytrade.R;
 import com.acpay.acapytrade.costs.costs;
@@ -100,7 +109,7 @@ public class CostFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 String from = (dateFrom.getText().toString().length() == 0) ? new SimpleDateFormat("yyyy-MM-dd").format(new Date()) : dateFrom.getText().toString();
-                String to = (dateTo.getText().toString().length() == 0) ? new SimpleDateFormat("yyyy-MM-dd").format(new Date()) :dateTo.getText().toString();
+                String to = (dateTo.getText().toString().length() == 0) ? new SimpleDateFormat("yyyy-MM-dd").format(new Date()) : dateTo.getText().toString();
                 String api = "https://www.app.acapy-trade.com/getexpendeCostDate.php?from="
                         + from
                         + "&to=" + to;
@@ -114,6 +123,7 @@ public class CostFragment extends Fragment {
                     public void run() {
                         if (costsJason.isFinish()) {
                             costsJasonResponse = costsJason.getUserId();
+                            adapter.clear();
                             adapter.addAll(fetchJason(costsJasonResponse));
                         } else {
                             boxeshandler.postDelayed(this, 100);
@@ -123,7 +133,24 @@ public class CostFragment extends Fragment {
                 boxeshandler.post(boxesrunnableCode);
             }
         });
+        setHasOptionsMenu(true);
+
+
+        OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
+            @Override
+            public void handleOnBackPressed() {
+                startActivity(new Intent(getContext(), MainActivity.class));
+              }
+        };
+        requireActivity().getOnBackPressedDispatcher().addCallback(this, callback);
+        ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle("انتقالات");
         return rootview;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        menu.clear();
     }
 
     private ArrayList<costs> fetchJason(String costsJasonResponse) {

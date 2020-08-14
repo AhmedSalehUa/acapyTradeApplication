@@ -17,6 +17,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import androidx.annotation.NonNull;
@@ -97,7 +98,7 @@ public class OrderFragment extends Fragment implements LoaderManager.LoaderCallb
 
             }
         });
-
+        ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle("Orders");
         return rootView;
     }
 

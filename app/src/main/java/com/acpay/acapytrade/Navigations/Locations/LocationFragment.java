@@ -2,6 +2,7 @@ package com.acpay.acapytrade.Navigations.Locations;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.Loader;
@@ -9,6 +10,8 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -43,7 +46,7 @@ public class LocationFragment extends Fragment implements LoaderManager.LoaderCa
                 public void onMapLongClick(LatLng latLng) {
                     MarkerOptions markerOptions = new MarkerOptions();
                     markerOptions.position(latLng);
-                     markerOptions.title(latLng.latitude + ":" + latLng.longitude);
+                    markerOptions.title(latLng.latitude + ":" + latLng.longitude);
                     goMap.clear();
                     goMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
                     goMap.addMarker(markerOptions);
@@ -71,9 +74,9 @@ public class LocationFragment extends Fragment implements LoaderManager.LoaderCa
         theListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int postion, long l) {
-                location location =adapter.getItem(postion);
+                location location = adapter.getItem(postion);
                 MarkerOptions markerOptions = new MarkerOptions();
-                LatLng latLng= location.latlang();
+                LatLng latLng = location.latlang();
                 markerOptions.position(latLng);
                 markerOptions.title(location.getLatitude() + ":" + location.getLonglatitude());
                 goMap.clear();
@@ -86,9 +89,16 @@ public class LocationFragment extends Fragment implements LoaderManager.LoaderCa
         loaderManager.initLoader(LOCATION_LOADER_ID, null, LocationFragment.this);
 
         adapter = new locationAdapter(getContext(), new ArrayList<location>());
-    theListView.setAdapter(adapter);
-
+        theListView.setAdapter(adapter);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Location");
+        setHasOptionsMenu(true);
         return rootView;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        menu.clear();
     }
 
     @Override

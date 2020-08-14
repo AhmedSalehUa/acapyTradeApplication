@@ -21,14 +21,23 @@ import android.widget.Spinner;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.acpay.acapytrade.Navigations.messages.sendNotification.APIService;
+import com.acpay.acapytrade.Navigations.messages.sendNotification.Client;
+import com.acpay.acapytrade.Navigations.messages.sendNotification.Data;
+import com.acpay.acapytrade.Navigations.messages.sendNotification.MyResponse;
+import com.acpay.acapytrade.Navigations.messages.sendNotification.Sender;
+import com.acpay.acapytrade.Navigations.messages.sendNotification.Token;
 import com.acpay.acapytrade.Networking.JasonReponser;
 import com.acpay.acapytrade.Order.Order;
 import com.acpay.acapytrade.Order.orderReponser;
 import com.acpay.acapytrade.Order.progressReponser;
 import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -40,6 +49,10 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class AddOrEditeOrderActivity extends AppCompatActivity {
     String actionType;
@@ -64,11 +77,15 @@ public class AddOrEditeOrderActivity extends AppCompatActivity {
     Order updatedOrder;
     List<String> spinnerArray;
 
+
+    APIService apiService;
+    Token token;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.addorder_activity);
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
+        apiService = Client.getClient("https://fcm.googleapis.com/").create(APIService.class);
         Intent data = getIntent();
         idUpdated = data.getStringExtra("id");
         mFirebaseDatabase = FirebaseDatabase.getInstance();
@@ -362,6 +379,7 @@ public class AddOrEditeOrderActivity extends AppCompatActivity {
                                                 String res = updateProgress.getUserId();
                                                 if (!res.equals("0")) {
                                                     Toast.makeText(AddOrEditeOrderActivity.this, "Saved", Toast.LENGTH_LONG).show();
+                                                 //   sendNotifiaction(,"You Have New Order",);
                                                     startActivity(new Intent(AddOrEditeOrderActivity.this, MainActivity.class));
                                                 } else {
                                                     Toast.makeText(AddOrEditeOrderActivity.this, "not saved", Toast.LENGTH_LONG).show();
@@ -502,5 +520,59 @@ public class AddOrEditeOrderActivity extends AppCompatActivity {
         }
 
         return boxes;
+    }
+    private void sendNotifiaction(String receiver, final String username, final String message) {
+
+        DatabaseReference tokens = FirebaseDatabase.getInstance().getReference("users").child(receiver);
+        ChildEventListener mChildEventListener = new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                token = snapshot.getValue(Token.class);
+
+                Data data = new Data(username, message);
+
+                Sender sender = new Sender(data, token.getToken());
+
+                apiService.sendNotification(sender)
+                        .enqueue(new Callback<MyResponse>() {
+                            @Override
+                            public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
+                                if (response.code() == 200) {
+                                    if (response.body().success != 1) {
+                                        Toast.makeText(AddOrEditeOrderActivity.this, "Failed!", Toast.LENGTH_SHORT).show();
+                                    }else {
+                                        Log.e("b","ok");
+                                    }
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(Call<MyResponse> call, Throwable t) {
+
+                            }
+                        });
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                token = snapshot.getValue(Token.class);
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        };
+        tokens.addChildEventListener(mChildEventListener);
     }
 }

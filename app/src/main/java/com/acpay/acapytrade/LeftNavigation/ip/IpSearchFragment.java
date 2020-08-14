@@ -1,34 +1,51 @@
 package com.acpay.acapytrade.LeftNavigation.ip;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.text.InputType;
 import android.text.format.Formatter;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
+import com.acpay.acapytrade.MainActivity;
+import com.acpay.acapytrade.Navigations.OrderFragment;
 import com.acpay.acapytrade.R;
 
+import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Array;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -38,10 +55,11 @@ public class IpSearchFragment extends Fragment {
     TextView urrentIp;
     ListView ipList;
     ProgressBar listProgress;
-    Button again;
+    Button again, preFixChange;
     NetworkSniffTask task;
     List<String> names;
     ArrayAdapter<String> adapter;
+    String prefix = "192.168.1.";
 
     public IpSearchFragment() {
         super();
@@ -57,12 +75,43 @@ public class IpSearchFragment extends Fragment {
         listProgress = (ProgressBar) rootview.findViewById(R.id.ipListProgress);
         emptyView = (TextView) rootview.findViewById(R.id.ipListEmpty);
         again = (Button) rootview.findViewById(R.id.searchAgain);
+        preFixChange = (Button) rootview.findViewById(R.id.pre);
         urrentIp = (TextView) rootview.findViewById(R.id.currentIp);
         ipList.setEmptyView(emptyView);
         ipList.setAdapter(adapter);
 
         task = new NetworkSniffTask();
         task.execute();
+        preFixChange.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AlertDialog.Builder alertDialog = new AlertDialog.Builder(getContext());
+                alertDialog.setTitle("تغير الip");
+                LinearLayout container = new LinearLayout(getContext());
+                container.setOrientation(LinearLayout.VERTICAL);
+                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                lp.setMargins(20, 20, 20, 20);
+                final EditText input = new EditText(getContext());
+                input.setLayoutParams(lp);
+                input.setGravity(Gravity.TOP | Gravity.LEFT);
+                input.setInputType(InputType.TYPE_TEXT_FLAG_CAP_SENTENCES | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
+                input.setLines(1);
+                input.setMaxLines(1);
+                input.setText(prefix);
+                container.addView(input, lp);
+
+                alertDialog.setView(container);
+                alertDialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        prefix = input.getText().toString();
+                    }
+                }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        Toast.makeText(getContext(), "canceled", Toast.LENGTH_SHORT).show();
+                    }
+                }).show();
+            }
+        });
         again.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -70,19 +119,40 @@ public class IpSearchFragment extends Fragment {
                 urrentIp.setText("");
                 task.cancel(true);
 
-                NetworkSniffTask tasek = new NetworkSniffTask();
-                tasek.execute();
+                task = new NetworkSniffTask();
+                task.execute();
             }
         });
-
-
+        ipList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                String ip = adapter.getItem(i);
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://" + ip));
+                startActivity(browserIntent);
+            }
+        });
+        setHasOptionsMenu(true);
+        OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
+            @Override
+            public void handleOnBackPressed() {
+                startActivity(new Intent(getContext(), MainActivity.class));
+            }
+        };
+        requireActivity().getOnBackPressedDispatcher().addCallback(this, callback);
+        ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle("IP Search");
         return rootview;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        menu.clear();
     }
 
     public class NetworkSniffTask extends AsyncTask<Void, NetworkSniffTask.MyTaskParams, List<String>> {
         private static final String TAG = "NetworkSniffTask";
         private WeakReference<Context> mContextRef;
-
+        String ip;
         List<String> list;
 
         public NetworkSniffTask() {
@@ -112,26 +182,44 @@ public class IpSearchFragment extends Fragment {
 
                     Log.e(TAG, "activeNetwork: " + String.valueOf(activeNetwork));
                     Log.e(TAG, "ipString: " + String.valueOf(ipString));
-                    String prefix = ipString.substring(0, ipString.lastIndexOf(".") + 1);
                     Log.e(TAG, "prefix: " + prefix);
                     list = new ArrayList<>();
                     for (int i = 0; i < 254; i++) {
-                        MyTaskParams myTaskParams = new MyTaskParams();
-                        String testIp = prefix + String.valueOf(i);
-                        myTaskParams.setProg(i);
-                        InetAddress name = InetAddress.getByName(testIp);
-                        String hostName = name.getCanonicalHostName();
-                        if (name.isReachable(1000)) {
-                            list.add(hostName);
-                            myTaskParams.setValue(hostName);
-                            publishProgress(myTaskParams);
-                            Log.e(TAG, "Host:" + hostName);
-                        } else {
-                            publishProgress(myTaskParams);
+                        ip = String.valueOf(i);
+                        if (isCancelled()) {
+                            break;
                         }
+                        final int finalI = i;
+                        new Thread(new Runnable() {
+                            public void run() {
+                                MyTaskParams myTaskParams = new MyTaskParams();
+                                String testIp = prefix + finalI;
+                                myTaskParams.setProg(finalI);
+                                InetAddress name = null;
+                                try {
+                                    name = InetAddress.getByName(testIp);
+                                } catch (UnknownHostException e) {
+                                    e.printStackTrace();
+                                }
+                                String hostName = name.getCanonicalHostName();
+                                try {
+                                    if (name.isReachable(3000)) {
+                                        list.add(hostName);
+                                        myTaskParams.setValue(hostName);
+                                        publishProgress(myTaskParams);
+                                        Log.e(TAG, "Host:" + hostName);
+                                    } else {
+                                        publishProgress(myTaskParams);
+                                    }
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }).start();
+
                     }
 
-                }else {
+                } else {
                     Log.e(TAG, "null");
                 }
             } catch (Throwable t) {
@@ -151,12 +239,12 @@ public class IpSearchFragment extends Fragment {
         @Override
         protected void onProgressUpdate(MyTaskParams... values) {
             super.onProgressUpdate(values);
-            if (values[0].getValue() != null) {
-                names.add(values[0].getValue());
-                adapter.add(values[0].getValue());
-                adapter.notifyDataSetChanged();
-            }
-            urrentIp.setText(values[0].getProg() + "");
+//            if (values[0].getValue() != null) {
+////                names.add(values[0].getValue());
+////                adapter.add(values[0].getValue());
+////                adapter.notifyDataSetChanged();
+////            }
+////            urrentIp.setText(values[0].getProg() + "");
 
         }
 
@@ -164,6 +252,9 @@ public class IpSearchFragment extends Fragment {
         protected void onPostExecute(List aVoid) {
             super.onPostExecute(aVoid);
             listProgress.setVisibility(View.GONE);
+            adapter.clear();
+            adapter.addAll(list);
+            adapter.notifyDataSetChanged();
             //  adapter.addAll(list);
         }
 
