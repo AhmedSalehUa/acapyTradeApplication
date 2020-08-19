@@ -11,7 +11,6 @@ import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
 import android.text.InputType;
 import android.text.format.Formatter;
 import android.util.Log;
@@ -38,16 +37,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import com.acpay.acapytrade.MainActivity;
-import com.acpay.acapytrade.Navigations.OrderFragment;
 import com.acpay.acapytrade.R;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
-import java.lang.reflect.Array;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class IpSearchFragment extends Fragment {
@@ -202,9 +198,10 @@ public class IpSearchFragment extends Fragment {
                                     e.printStackTrace();
                                 }
                                 String hostName = name.getCanonicalHostName();
+                                String hoName = name.getHostAddress();
                                 try {
                                     if (name.isReachable(3000)) {
-                                        list.add(hostName);
+                                        list.add(hoName);
                                         myTaskParams.setValue(hostName);
                                         publishProgress(myTaskParams);
                                         Log.e(TAG, "Host:" + hostName);

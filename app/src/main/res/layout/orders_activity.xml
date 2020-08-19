@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-
+<androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/pullToRefresh"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical">
 
-    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-        android:id="@+id/pullToRefresh"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent">
 
         <ListView
             android:id="@+id/orderMainList"
@@ -17,23 +16,23 @@
             android:layout_height="match_parent"
             android:padding="20dp"
             android:divider="@color/fui_transparent"
+            android:layout_centerInParent="true"
             android:dividerHeight="20dp"
             tools:listitem="@layout/orders_activity_list_header" />
 
         <TextView
-            android:id="@+id/no_books"
+            android:id="@+id/listEmptyOrder"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignBottom="@id/lood_progress"
             android:layout_centerInParent="true" />
 
         <ProgressBar
-            android:id="@+id/lood_progress"
+            android:id="@+id/listProgressOrder"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true" />
 
-    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+    </RelativeLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_button"
@@ -43,4 +42,4 @@
         android:layout_alignParentBottom="true"
         android:layout_margin="20dp"
         android:src="@drawable/ic_baseline_add_24" />
-</RelativeLayout>
+</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

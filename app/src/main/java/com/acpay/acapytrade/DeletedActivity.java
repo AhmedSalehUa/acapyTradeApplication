@@ -11,10 +11,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.Loader;
 
-import com.acpay.acapytrade.Navigations.OrderDeleted;
-import com.acpay.acapytrade.Order.Order;
-import com.acpay.acapytrade.Order.OrderAdapter;
-import com.acpay.acapytrade.Order.OrderLoader;
+import com.acpay.acapytrade.Navigations.Order.OrderDeleted;
+import com.acpay.acapytrade.OrderOperations.Order;
+import com.acpay.acapytrade.OrderOperations.OrderAdapter;
+import com.acpay.acapytrade.OrderOperations.OrderLoader;
 
 import java.util.List;
 

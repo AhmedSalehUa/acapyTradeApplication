@@ -30,6 +30,7 @@ public class LoginActivity extends AppCompatActivity {
     private FirebaseAuth.AuthStateListener mAuthStateListener;
     public static final int RC_SIGN_IN = 1;
     String token;
+    Tokens tokens;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -39,6 +40,7 @@ public class LoginActivity extends AppCompatActivity {
         mFirebaseAuth = FirebaseAuth.getInstance();
 
         mDatabaseReference = mFirebaseDatabase.getReference().child("users");
+
         FirebaseInstanceId.getInstance().getInstanceId()
                 .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
                     @Override
@@ -48,50 +50,60 @@ public class LoginActivity extends AppCompatActivity {
                             return;
                         }
 
-                        // Get new Instance ID token
-                        token = task.getResult().getToken();
 
+                        token = task.getResult().getToken();
+                        tokens = new Tokens(token);
+
+
+                        mAuthStateListener = new FirebaseAuth.AuthStateListener() {
+                            @Override
+                            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                                final FirebaseUser user = firebaseAuth.getCurrentUser();
+                                if (user != null) {
+                                    mDatabaseReference = mFirebaseDatabase.getReference().child("users").child(user.getDisplayName());
+                                    mDatabaseReference.removeValue();
+                                    User Fireuser = new User(user.getDisplayName(), user.getUid(), "offline");
+                                    mDatabaseReference.push().setValue(Fireuser);
+                                    if (user.getDisplayName().equals("Ahmed Saleh")) {
+
+                                    } else {
+                                        DatabaseReference mDatabaseReference = mFirebaseDatabase.getReference().child("tokens").child(user.getDisplayName());
+                                        mDatabaseReference.removeValue();
+                                        mDatabaseReference.push().setValue(tokens);
+                                    }
+                                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+
+                                    startActivity(intent);
+                                } else {
+                                    List<AuthUI.IdpConfig> providers = Arrays.asList(
+                                            new AuthUI.IdpConfig.EmailBuilder().build(),
+                                            new AuthUI.IdpConfig.PhoneBuilder().build());
+                                    startActivityForResult(
+                                            AuthUI.getInstance()
+                                                    .createSignInIntentBuilder()
+                                                    .setAvailableProviders(providers).setIsSmartLockEnabled(false)
+                                                    .build(),
+                                            RC_SIGN_IN);
+                                }
+                            }
+                        };
+
+                        mFirebaseAuth.addAuthStateListener(mAuthStateListener);
                         // Log and toast
                         String msg = getString(R.string.msg_token_fmt, token);
                         Log.d("token", token);
                         // Toast.makeText(MainActivity.this, msg, Toast.LENGTH_SHORT).show();
                     }
                 });
-        mAuthStateListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                final FirebaseUser user = firebaseAuth.getCurrentUser();
-                if (user != null) {
-                    if(user.getDisplayName().equals("Ahmed Saleh")){
 
-                    }else {
-                    mDatabaseReference = mFirebaseDatabase.getReference().child("users").child(user.getDisplayName());
-                    mDatabaseReference.removeValue();
-                    User Fireuser = new User(user.getDisplayName(), user.getUid(), token,"offline");
-                    mDatabaseReference.push().setValue(Fireuser);}
-                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                    intent.putExtra("token",token);
-                    startActivity(intent);
-                } else {
-                    List<AuthUI.IdpConfig> providers = Arrays.asList(
-                            new AuthUI.IdpConfig.EmailBuilder().build(),
-                            new AuthUI.IdpConfig.PhoneBuilder().build());
-                    startActivityForResult(
-                            AuthUI.getInstance()
-                                    .createSignInIntentBuilder()
-                                    .setAvailableProviders(providers).setIsSmartLockEnabled(false)
-                                    .build(),
-                            RC_SIGN_IN);
-                }
-            }
-        };
-        mFirebaseAuth.addAuthStateListener(mAuthStateListener);
+
     }
 
     @Override
     protected void onStart() {
-        mFirebaseAuth.addAuthStateListener(mAuthStateListener);
+
         super.onStart();
     }
+
 
 }

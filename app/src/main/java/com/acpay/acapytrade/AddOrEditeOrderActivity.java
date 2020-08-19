@@ -1,7 +1,9 @@
 package com.acpay.acapytrade;
 
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -18,6 +20,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
@@ -25,16 +28,16 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.acpay.acapytrade.Navigations.messages.sendNotification.APIService;
-import com.acpay.acapytrade.Navigations.messages.sendNotification.Client;
-import com.acpay.acapytrade.Navigations.messages.sendNotification.Data;
-import com.acpay.acapytrade.Navigations.messages.sendNotification.MyResponse;
-import com.acpay.acapytrade.Navigations.messages.sendNotification.Sender;
-import com.acpay.acapytrade.Navigations.messages.sendNotification.Token;
+import com.acpay.acapytrade.Navigations.Messages.sendNotification.APIService;
+import com.acpay.acapytrade.Navigations.Messages.sendNotification.Client;
+import com.acpay.acapytrade.Navigations.Messages.sendNotification.Data;
+import com.acpay.acapytrade.Navigations.Messages.sendNotification.MyResponse;
+import com.acpay.acapytrade.Navigations.Messages.sendNotification.Sender;
+import com.acpay.acapytrade.Navigations.Messages.sendNotification.Token;
 import com.acpay.acapytrade.Networking.JasonReponser;
-import com.acpay.acapytrade.Order.Order;
-import com.acpay.acapytrade.Order.orderReponser;
-import com.acpay.acapytrade.Order.progressReponser;
+import com.acpay.acapytrade.OrderOperations.Order;
+import com.acpay.acapytrade.OrderOperations.orderReponser;
+import com.acpay.acapytrade.OrderOperations.progressReponser;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -46,6 +49,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -69,6 +73,7 @@ public class AddOrEditeOrderActivity extends AppCompatActivity {
     String TokenList = "";
     EditText place, location, date, time, matter, files, notes, fixtrype, dlivercost;
     EditText pickedDate, pickedTime, addProgTex;
+    TextView usernames;
     ImageView removeProg, addProg;
     String placeVal, locationVal, dateVal, timeVal, matterVal, filesVal, notesVal, fixtrypeVal, dlivercostVal;
     String Api;
@@ -76,10 +81,11 @@ public class AddOrEditeOrderActivity extends AppCompatActivity {
     String idUpdated;
     Order updatedOrder;
     List<String> spinnerArray;
-
-
+    List<String> usersList;
+    boolean[] checkedColors;
     APIService apiService;
     Token token;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -90,7 +96,7 @@ public class AddOrEditeOrderActivity extends AppCompatActivity {
         idUpdated = data.getStringExtra("id");
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         mDatabaseReference = mFirebaseDatabase.getReference().child("orders");
-        userIdSpinner = (Spinner) findViewById(R.id.spinner_gender);
+        // userIdSpinner = (Spinner) findViewById(R.id.spinner_gender);
         place = (EditText) findViewById(R.id.addorder_place);
         location = (EditText) findViewById(R.id.addorder_location);
         date = (EditText) findViewById(R.id.addorder_date);
@@ -104,6 +110,7 @@ public class AddOrEditeOrderActivity extends AppCompatActivity {
         pickedTime = (EditText) findViewById(R.id.addorder_time);
         addProgTex = (EditText) findViewById(R.id.addorder_progItem);
         progList = (ListView) findViewById(R.id.listOfProgress);
+        usernames = (TextView) findViewById(R.id.usersname);
         addProg = (ImageView) findViewById(R.id.addorder_time_add_prog);
         removeProg = (ImageView) findViewById(R.id.addorder_time_remove_prog);
         if (idUpdated == null) {
@@ -126,7 +133,7 @@ public class AddOrEditeOrderActivity extends AppCompatActivity {
                 if (update.isFinish()) {
                     TokenList = update.getUserId();
                     Log.w(" ", TokenList);
-                    setupSpinner();
+                   // setupSpinner();
                     Toast.makeText(AddOrEditeOrderActivity.this, "Ready", Toast.LENGTH_LONG).show();
                 } else {
                     handler.postDelayed(this, 100);
@@ -322,9 +329,7 @@ public class AddOrEditeOrderActivity extends AppCompatActivity {
                                             if (updateProgress.isFinish()) {
                                                 String res = updateProgress.getUserId();
                                                 if (!res.equals("0")) {
-
-                                                    mDatabaseReference.child(OrderUserName).push().setValue("new" + dateVal);
-
+                                                    SendNotification send = new SendNotification(AddOrEditeOrderActivity.this, getReciverName(userName), "new order", "تم اضافة اوردر خاص بك");
                                                     Toast.makeText(AddOrEditeOrderActivity.this, "Saved", Toast.LENGTH_LONG).show();
                                                     startActivity(new Intent(AddOrEditeOrderActivity.this, MainActivity.class));
                                                 } else {
@@ -349,11 +354,11 @@ public class AddOrEditeOrderActivity extends AppCompatActivity {
                 } else if (actionType.equals("update")) {
                     setUPVariables();
                     setUpApi();
-                    Api+="&orderNum="+idUpdated;
+                    Api += "&orderNum=" + idUpdated;
                     Log.w("addOrder", Api);
                     final JasonReponser update = new JasonReponser();
                     update.setFinish(false);
-                    update.execute(Api+"&orderNum="+idUpdated);
+                    update.execute(Api + "&orderNum=" + idUpdated);
                     final Handler handler = new Handler();
                     Runnable runnableCode = new Runnable() {
                         @Override
@@ -379,7 +384,7 @@ public class AddOrEditeOrderActivity extends AppCompatActivity {
                                                 String res = updateProgress.getUserId();
                                                 if (!res.equals("0")) {
                                                     Toast.makeText(AddOrEditeOrderActivity.this, "Saved", Toast.LENGTH_LONG).show();
-                                                 //   sendNotifiaction(,"You Have New Order",);
+                                                    SendNotification send = new SendNotification(AddOrEditeOrderActivity.this, getReciverName(userName), "new order", "تم تعديل اوردر خاص بك");
                                                     startActivity(new Intent(AddOrEditeOrderActivity.this, MainActivity.class));
                                                 } else {
                                                     Toast.makeText(AddOrEditeOrderActivity.this, "not saved", Toast.LENGTH_LONG).show();
@@ -407,13 +412,22 @@ public class AddOrEditeOrderActivity extends AppCompatActivity {
     }
 
     private void setUpApi() {
-        Api = "https://www.app.acapy-trade.com/addOrders.php?uid=" + userId
-                + "&place=" + placeVal + "&location=" + locationVal
+        Api = "https://www.app.acapy-trade.com/addOrdersNew.php?"
+                + "place=" + placeVal + "&location=" + locationVal
                 + "&date=" + dateVal + "&time=" + timeVal
                 + "&mater=" + matterVal + "&file=" + filesVal
                 + "&notes=" + notesVal + "&fixType=" + fixtrypeVal
-                + "&amount=" + dlivercostVal + "&username=" + userName;
+                + "&amount=" + dlivercostVal;
+        for (int i = 0; i < checkedColors.length; i++) {
+            boolean checked = checkedColors[i];
+            if (checked) {
+                Api += "&username[]=" + usersList.get(i);
+                Api += "&uid[]=" + getId(usersList.get(i));
+            }
+        }
     }
+
+
 
     private void setUPVariables() {
         placeVal = place.getText().toString();
@@ -474,7 +488,7 @@ public class AddOrEditeOrderActivity extends AppCompatActivity {
             public void run() {
                 if (update.isFinish()) {
                     String order = update.getUserId();
-                    Log.e("sa",order);
+                    Log.e("sa", order);
                     final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(AddOrEditeOrderActivity.this, android.R.layout.simple_list_item_1, fetchBoxsJason(order));
                     progList.setAdapter(arrayAdapter);
                     addProg.setOnClickListener(new View.OnClickListener() {
@@ -521,58 +535,98 @@ public class AddOrEditeOrderActivity extends AppCompatActivity {
 
         return boxes;
     }
-    private void sendNotifiaction(String receiver, final String username, final String message) {
 
-        DatabaseReference tokens = FirebaseDatabase.getInstance().getReference("users").child(receiver);
-        ChildEventListener mChildEventListener = new ChildEventListener() {
-            @Override
-            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                token = snapshot.getValue(Token.class);
 
-                Data data = new Data(username, message);
-
-                Sender sender = new Sender(data, token.getToken());
-
-                apiService.sendNotification(sender)
-                        .enqueue(new Callback<MyResponse>() {
-                            @Override
-                            public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
-                                if (response.code() == 200) {
-                                    if (response.body().success != 1) {
-                                        Toast.makeText(AddOrEditeOrderActivity.this, "Failed!", Toast.LENGTH_SHORT).show();
-                                    }else {
-                                        Log.e("b","ok");
-                                    }
-                                }
-                            }
-
-                            @Override
-                            public void onFailure(Call<MyResponse> call, Throwable t) {
-
-                            }
-                        });
-            }
-
-            @Override
-            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                token = snapshot.getValue(Token.class);
-            }
-
-            @Override
-            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        };
-        tokens.addChildEventListener(mChildEventListener);
+    private String getReciverName(String name) {
+        switch (name) {
+            case "Ahmed":
+                return "Ahmed Saleh";
+            case "George":
+                return "George Elgndy";
+            case "Remon":
+                return "Remon";
+            case "Mohamed":
+                return "Mohamed Hammad";
+        }
+        return "";
     }
+
+    public void setUsersList(View view) {
+        usernames.setText("");matter.setText("");
+        AlertDialog.Builder builder = new AlertDialog.Builder(AddOrEditeOrderActivity.this);
+        String[] colors = new String[]{
+                "Ahmed",
+                "Mohamed",
+                "Remon",
+                "George"
+        };
+
+        checkedColors = new boolean[]{
+                false,
+                false,
+                false,
+                false
+        };
+        usersList = Arrays.asList(colors);
+
+        builder.setMultiChoiceItems(colors, checkedColors, new DialogInterface.OnMultiChoiceClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+                checkedColors[which] = isChecked;
+
+                String currentItem = usersList.get(which);
+            }
+        });
+
+        // Specify the dialog is not cancelable
+        builder.setCancelable(false);
+
+        // Set a title for alert dialog
+        builder.setTitle("Order For");
+
+        // Set the positive/yes button click listener
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                for (int i = 0; i < checkedColors.length; i++) {
+                    boolean checked = checkedColors[i];
+                    if (checked) {
+                        usernames.setText(usernames.getText() + " - " + usersList.get(i));
+                        matter.setText(matter.getText() + " - " + usersList.get(i));
+                    }
+                }
+            }
+        });
+
+        // Set the negative/no button click listener
+        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // Do something when click the negative button
+            }
+        });
+
+        // Set the neutral/cancel button click listener
+        builder.setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // Do something when click the neutral button
+            }
+        });
+
+        AlertDialog dialog = builder.create();
+        // Display the alert dialog on interface
+        dialog.show();
+    }
+    private String getId(String s) {
+        switch (s){
+            case "Ahmed": return "3grT34bqUdSG4WHVYFRuxDaIm1I3";
+            case "Mohamed": return "aRisjHAS36R5qrvXgAO8fpNIiLE3";
+            case "Remon": return "xHIE6dwSIwQB8rm3geTBzfJdN0r2";
+            case "George": return "CREjud2a6YXajLzJJTtHqttthgp1";
+        }
+        return "";
+    }
+
 }

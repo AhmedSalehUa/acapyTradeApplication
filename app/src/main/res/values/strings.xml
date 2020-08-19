@@ -94,4 +94,13 @@
     <string name="left_nav_group">Other</string>
     <string name="lef_nav_ip">ip search</string>
     <string name="lef_nav_notes">Notes</string>
+    <string name="nav_transitions_names">Names</string>
+    <string name="nav_transitions_pay">Pay</string>
+    <string name="nav_transitions_paied">Done</string>
+    <string name="tarnsition_content_pay">Pay</string>
+    <string name="tarnsition_content_unpay">" back out of payment"</string>
+    <string name="choose">choose</string>
+    <string name="nav_notes_places">Places</string>
+    <string name="nav_notes_devices">Devices</string>
+    <string name="nav_notes_details">Details</string>
 </resources>

@@ -6,28 +6,6 @@
     android:layout_height="match_parent">
 
 
-
-<!--    <ListView-->
-<!--        android:id="@+id/order_list_pending"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="match_parent"-->
-<!--        android:layout_margin="20dp"-->
-<!--        android:divider="@color/fui_transparent"-->
-<!--        android:dividerHeight="20dp"-->
-<!--        tools:listitem="@layout/orders_activity_list_header" />-->
-
-<!--    <TextView-->
-<!--        android:id="@+id/no_orders"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_alignBottom="@id/lood_progress"-->
-<!--        android:layout_centerInParent="true" />-->
-
-<!--    <ProgressBar-->
-<!--        android:id="@+id/lood_progress_pending"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_centerInParent="true" />-->
     <FrameLayout
         android:id="@+id/pending_container"
         android:layout_width="match_parent"
