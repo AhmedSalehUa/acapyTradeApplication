@@ -63,12 +63,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     FirebaseUser user;
     String token;
     int countMessage = 0;
+    int BottomMargin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        FrameLayout framaeLayouat = (FrameLayout) findViewById(R.id.fragment_container);
+        ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) framaeLayouat.getLayoutParams();
+        BottomMargin= params.bottomMargin;
         Dexter.withActivity(this).withPermissions(Arrays.asList(Manifest.permission.FOREGROUND_SERVICE, Manifest.permission.ACCESS_WIFI_STATE)).withListener(new MultiplePermissionsListener() {
             @Override
             public void onPermissionsChecked(MultiplePermissionsReport report) {
@@ -160,11 +163,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
         switch (menuItem.getItemId()) {
             case R.id.lef_nav_home:
+                FrameLayout framaeLayouat = (FrameLayout) findViewById(R.id.fragment_container);
+                ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) framaeLayouat.getLayoutParams();
+                params.setMargins(0, 0, 0, BottomMargin);
+                framaeLayouat.setLayoutParams(params);
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new HomeFragment()).commit();
                 bottomNav.setVisibility(View.VISIBLE);
                 bottomNav.setSelectedItemId(R.id.nav_bot_order);
                 break;
             case R.id.lef_nav_cost:
+
                 FrameLayout frameLayout = (FrameLayout) findViewById(R.id.fragment_container);
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new TransitionsFragment(frameLayout)).commit();
                 bottomNav.setVisibility(View.INVISIBLE);
@@ -175,8 +183,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 break;
             case R.id.lef_nav_notes:
                 FrameLayout framaeLayout = (FrameLayout) findViewById(R.id.fragment_container);
-             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new NotesFragment(framaeLayout)).commit();
-               bottomNav.setVisibility(View.INVISIBLE);
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new NotesFragment(framaeLayout)).commit();
+                bottomNav.setVisibility(View.INVISIBLE);
                 break;
 
         }

@@ -7,10 +7,18 @@
 
     <!-- Accent color for UI controls like checkboxes and text fields -->
     <color name="colorAccent">#F0514B</color>
-
+    <color name="colorListDivider">#e6e6e6</color>
     <!-- Primary color for the editor -->
     <color name="editorColorPrimary">#2D3640</color>
 
+    <color name="transparent">#00ffffff</color>
+    <color name="bgSolidDark">#55000000</color>
+
+    <color name="headGradientStart">#00ffffff</color>
+    <color name="headGradientCenter">#00ffffff</color>
+    <color name="headGradientEnd">#96000000</color>
+    <color name="bgGradientStart">#000000</color>
+    <color name="bgGradientEnd">#d8000000</color>
     <!-- Primary dark color for the editor -->
     <color name="editorColorPrimaryDark">#394450</color>
 

@@ -47,8 +47,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class IpSearchFragment extends Fragment {
-    TextView emptyView;
-    TextView urrentIp;
+    TextView emptyView; 
     ListView ipList;
     ProgressBar listProgress;
     Button again, preFixChange;
@@ -72,12 +71,26 @@ public class IpSearchFragment extends Fragment {
         emptyView = (TextView) rootview.findViewById(R.id.ipListEmpty);
         again = (Button) rootview.findViewById(R.id.searchAgain);
         preFixChange = (Button) rootview.findViewById(R.id.pre);
-        urrentIp = (TextView) rootview.findViewById(R.id.currentIp);
+
         ipList.setEmptyView(emptyView);
         ipList.setAdapter(adapter);
+        ConnectivityManager cm =
+                (ConnectivityManager) getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
 
-        task = new NetworkSniffTask();
-        task.execute();
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        boolean isConnected = activeNetwork != null &&
+                activeNetwork.isConnectedOrConnecting();
+
+        if (isConnected) {
+            if (activeNetwork.getType() == ConnectivityManager.TYPE_WIFI) {
+                task = new NetworkSniffTask();
+                task.execute();
+            } else {
+                listProgress.setVisibility(View.GONE);
+                emptyView.setText("you connect from mobile data");
+            }
+        }
+
         preFixChange.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -112,11 +125,24 @@ public class IpSearchFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 adapter.clear();
-                urrentIp.setText("");
+                if (task!=null)
                 task.cancel(true);
+                ConnectivityManager cm =
+                        (ConnectivityManager) getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
 
-                task = new NetworkSniffTask();
-                task.execute();
+                NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+                boolean isConnected = activeNetwork != null &&
+                        activeNetwork.isConnectedOrConnecting();
+
+                if (isConnected) {
+                    if (activeNetwork.getType() == ConnectivityManager.TYPE_WIFI) {
+                        listProgress.setVisibility(View.VISIBLE);
+                        task = new NetworkSniffTask();
+                        task.execute();
+                    } else {
+                        emptyView.setText("you connect from mobile data");
+                    }
+                }
             }
         });
         ipList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -135,7 +161,7 @@ public class IpSearchFragment extends Fragment {
             }
         };
         requireActivity().getOnBackPressedDispatcher().addCallback(this, callback);
-        ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle("IP Search");
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("IP Search");
         return rootview;
     }
 
@@ -236,12 +262,6 @@ public class IpSearchFragment extends Fragment {
         @Override
         protected void onProgressUpdate(MyTaskParams... values) {
             super.onProgressUpdate(values);
-//            if (values[0].getValue() != null) {
-////                names.add(values[0].getValue());
-////                adapter.add(values[0].getValue());
-////                adapter.notifyDataSetChanged();
-////            }
-////            urrentIp.setText(values[0].getProg() + "");
 
         }
 
@@ -249,6 +269,7 @@ public class IpSearchFragment extends Fragment {
         protected void onPostExecute(List aVoid) {
             super.onPostExecute(aVoid);
             listProgress.setVisibility(View.GONE);
+            emptyView.setText("no ip found");
             adapter.clear();
             adapter.addAll(list);
             adapter.notifyDataSetChanged();

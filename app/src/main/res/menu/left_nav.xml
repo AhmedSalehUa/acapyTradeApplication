@@ -13,14 +13,16 @@
     </group>
     <item android:title="@string/left_nav_group">
         <menu>
-            <item
-                android:id="@+id/lef_nav_ip"
-                android:icon="@drawable/ic_baseline_network_check_24"
-                android:title="@string/lef_nav_ip" />
-            <item
-                android:id="@+id/lef_nav_notes"
-                android:icon="@drawable/ic_baseline_note_add_24"
-                android:title="@string/lef_nav_notes" />
+            <group android:checkableBehavior="single">
+                <item
+                    android:id="@+id/lef_nav_ip"
+                    android:icon="@drawable/ic_baseline_network_check_24"
+                    android:title="@string/lef_nav_ip" />
+                <item
+                    android:id="@+id/lef_nav_notes"
+                    android:icon="@drawable/ic_baseline_note_add_24"
+                    android:title="@string/lef_nav_notes" />
+            </group>
         </menu>
     </item>
 

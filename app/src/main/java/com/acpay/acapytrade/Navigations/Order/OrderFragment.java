@@ -36,6 +36,7 @@ import com.acpay.acapytrade.R;
 import com.acpay.acapytrade.OrderOperations.Order;
 import com.acpay.acapytrade.OrderOperations.OrderLoader;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.jpardogo.android.googleprogressbar.library.FoldingCirclesDrawable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,8 +46,6 @@ public class OrderFragment extends Fragment implements LoaderManager.LoaderCallb
     private String ApiUrl = " https://www.app.acapy-trade.com/orders.php?type=ok";
 
     OrderAdapter adapter;
-    TextView State;
-    ProgressBar Loding;
     LoaderManager loaderManager;
     private static final int ORDER_LOADER_ID = 1;
 
@@ -62,6 +61,7 @@ public class OrderFragment extends Fragment implements LoaderManager.LoaderCallb
         View rootView = inflater.inflate(R.layout.orders_activity, container, false);
         final SwipeRefreshLayout pullToRefresh = rootView.findViewById(R.id.pullToRefresh);
         progressBar=(ProgressBar)rootView.findViewById(R.id.listProgressOrder);
+
         emptyList=(TextView)rootView.findViewById(R.id.listEmptyOrder);
         emptyList.setText("جارى التحميل");
         pullToRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -119,7 +119,6 @@ public class OrderFragment extends Fragment implements LoaderManager.LoaderCallb
             public void onItemClick(AdapterView<?> adapterView, View view, int pos, long l) {
                 Order order = adapter.getItem(pos);
                 getFragmentManager().beginTransaction().replace(R.id.fragment_container, new OrderDetailsFragement(order)).commit();
-
 
             }
         });

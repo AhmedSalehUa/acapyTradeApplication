@@ -47,6 +47,12 @@
                 android:value=".MainActivity" />
         </activity>
         <activity
+            android:name=".LeftNavigation.Notes.AddPlace"
+            android:theme="@style/EditorTheme"/>
+        <activity
+            android:name=".LeftNavigation.Notes.AddDevice"
+            android:theme="@style/EditorTheme"/>
+        <activity
             android:name=".PendingRequests"
             android:label="@string/pending_requests"
             android:theme="@style/EditorTheme">

@@ -133,7 +133,7 @@ public class AddOrEditeOrderActivity extends AppCompatActivity {
                 if (update.isFinish()) {
                     TokenList = update.getUserId();
                     Log.w(" ", TokenList);
-                   // setupSpinner();
+
                     Toast.makeText(AddOrEditeOrderActivity.this, "Ready", Toast.LENGTH_LONG).show();
                 } else {
                     handler.postDelayed(this, 100);
@@ -329,7 +329,13 @@ public class AddOrEditeOrderActivity extends AppCompatActivity {
                                             if (updateProgress.isFinish()) {
                                                 String res = updateProgress.getUserId();
                                                 if (!res.equals("0")) {
-                                                    SendNotification send = new SendNotification(AddOrEditeOrderActivity.this, getReciverName(userName), "new order", "تم اضافة اوردر خاص بك");
+
+                                                    for (int i = 0; i < checkedColors.length; i++) {
+                                                        boolean checked = checkedColors[i];
+                                                        if (checked) {
+                                                            SendNotification send = new SendNotification(AddOrEditeOrderActivity.this, getReciverName(usersList.get(i)), "new order", "تم اضافة اوردر خاص بك");
+                                                        }
+                                                    }
                                                     Toast.makeText(AddOrEditeOrderActivity.this, "Saved", Toast.LENGTH_LONG).show();
                                                     startActivity(new Intent(AddOrEditeOrderActivity.this, MainActivity.class));
                                                 } else {
@@ -384,7 +390,14 @@ public class AddOrEditeOrderActivity extends AppCompatActivity {
                                                 String res = updateProgress.getUserId();
                                                 if (!res.equals("0")) {
                                                     Toast.makeText(AddOrEditeOrderActivity.this, "Saved", Toast.LENGTH_LONG).show();
-                                                    SendNotification send = new SendNotification(AddOrEditeOrderActivity.this, getReciverName(userName), "new order", "تم تعديل اوردر خاص بك");
+
+                                                    for (int i = 0; i < checkedColors.length; i++) {
+                                                        boolean checked = checkedColors[i];
+                                                        if (checked) {
+                                                            SendNotification send = new SendNotification(AddOrEditeOrderActivity.this, getReciverName(usersList.get(i)), "new order", "تم تعديل اوردر خاص بك");
+                                                        }
+                                                    }
+
                                                     startActivity(new Intent(AddOrEditeOrderActivity.this, MainActivity.class));
                                                 } else {
                                                     Toast.makeText(AddOrEditeOrderActivity.this, "not saved", Toast.LENGTH_LONG).show();

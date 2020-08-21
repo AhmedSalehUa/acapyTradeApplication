@@ -103,4 +103,17 @@
     <string name="nav_notes_places">Places</string>
     <string name="nav_notes_devices">Devices</string>
     <string name="nav_notes_details">Details</string>
+    <string name="addPlace_name">Place Name</string>
+    <string name="addPlace_location">Place Location</string>
+    <string name="addPlace_details">Details</string>
+    <string name="deivceName">Device Name</string>
+    <string name="deivceType">Device Type</string>
+    <string name="deivceModel">Device Model</string>
+    <string name="deivceDetails">Device Details</string>
+    <string name="deivceIp">IP</string>
+    <string name="deivcePort">Port</string>
+    <string name="deivceUsername">UserName</string>
+    <string name="deivcePassword">Password</string>
+    <string name="deivceEmail">E-Mail</string>
+    <string name="deivceEmailPassword">E-Mail Password</string>
 </resources>

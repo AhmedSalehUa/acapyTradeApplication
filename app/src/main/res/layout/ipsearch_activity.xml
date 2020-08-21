@@ -20,20 +20,13 @@
         android:layout_alignParentTop="true"
         android:text="choose ip to start" />
 
-    <TextView
-        android:id="@+id/currentIp"
-        android:layout_width="wrap_content"
-        android:layout_height="50dp"
-        android:layout_alignParentTop="true"
-        android:layout_toRightOf="@id/pre"
-        android:gravity="center_horizontal"
-        android:textAlignment="center" />
+
 
     <ListView
         android:id="@+id/ipList"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/currentIp"
+        android:layout_below="@id/pre"
         tools:listitem="@layout/ipsearch_item" />
 
     <ProgressBar
