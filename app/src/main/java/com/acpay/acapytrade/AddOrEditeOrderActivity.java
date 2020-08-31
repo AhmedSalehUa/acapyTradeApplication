@@ -24,23 +24,18 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.acpay.acapytrade.Navigations.Messages.sendNotification.APIService;
 import com.acpay.acapytrade.Navigations.Messages.sendNotification.Client;
 import com.acpay.acapytrade.Navigations.Messages.sendNotification.Data;
-import com.acpay.acapytrade.Navigations.Messages.sendNotification.MyResponse;
-import com.acpay.acapytrade.Navigations.Messages.sendNotification.Sender;
 import com.acpay.acapytrade.Navigations.Messages.sendNotification.Token;
 import com.acpay.acapytrade.Networking.JasonReponser;
 import com.acpay.acapytrade.OrderOperations.Order;
 import com.acpay.acapytrade.OrderOperations.orderReponser;
 import com.acpay.acapytrade.OrderOperations.progressReponser;
 import com.google.firebase.database.ChildEventListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -53,10 +48,6 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class AddOrEditeOrderActivity extends AppCompatActivity {
     String actionType;
@@ -333,7 +324,8 @@ public class AddOrEditeOrderActivity extends AppCompatActivity {
                                                     for (int i = 0; i < checkedColors.length; i++) {
                                                         boolean checked = checkedColors[i];
                                                         if (checked) {
-                                                            SendNotification send = new SendNotification(AddOrEditeOrderActivity.this, getReciverName(usersList.get(i)), "new order", "تم اضافة اوردر خاص بك");
+                                                            Data data = new Data( "new order", "تم اضافة اوردر خاص بك","order");
+                                                            SendNotification send = new SendNotification(AddOrEditeOrderActivity.this,getReciverName(usersList.get(i)),data);
                                                         }
                                                     }
                                                     Toast.makeText(AddOrEditeOrderActivity.this, "Saved", Toast.LENGTH_LONG).show();
@@ -394,7 +386,8 @@ public class AddOrEditeOrderActivity extends AppCompatActivity {
                                                     for (int i = 0; i < checkedColors.length; i++) {
                                                         boolean checked = checkedColors[i];
                                                         if (checked) {
-                                                            SendNotification send = new SendNotification(AddOrEditeOrderActivity.this, getReciverName(usersList.get(i)), "new order", "تم تعديل اوردر خاص بك");
+                                                            Data data =new Data( "new order", "تم تعديل اوردر خاص بك","order");
+                                                            SendNotification send = new SendNotification(AddOrEditeOrderActivity.this, getReciverName(usersList.get(i)),data);
                                                         }
                                                     }
 

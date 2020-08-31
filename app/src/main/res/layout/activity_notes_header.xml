@@ -4,27 +4,51 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="25dp" />
-
     <RelativeLayout
         android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true">
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:padding="25dp" />
+
+        <TextView
+            android:id="@+id/editeCard"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_margin="10dp"
+            android:background="@drawable/ic_edite" />
+
+        <TextView
+            android:id="@+id/deleteCard"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/editeCard"
+            android:layout_alignParentRight="true"
+            android:layout_margin="10dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/ic_delete" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:background="@android:color/white"
         android:padding="15dp">
+
 
         <ImageView
             android:id="@+id/avatar"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_marginEnd="10dp"
-            android:layout_marginRight="10dp"  />
+            android:layout_marginRight="10dp" />
 
         <TextView
             android:id="@+id/placeName"
@@ -41,6 +65,7 @@
             android:layout_marginLeft="10dp"
             android:layout_toEndOf="@id/placeName"
             android:layout_toRightOf="@id/placeName" />
+
         <TextView
             android:id="@+id/placeDetails"
             android:layout_width="wrap_content"
@@ -49,7 +74,8 @@
             android:layout_marginTop="5dp"
             android:layout_toEndOf="@id/avatar"
             android:layout_toRightOf="@id/avatar" />
-        <LinearLayout
+
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/placeDetails"
@@ -68,11 +94,14 @@
             <TextView
                 android:id="@+id/socialViewsCount"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/socialViewsCountIcon" />
 
-        </LinearLayout>
-
+        </RelativeLayout>
     </RelativeLayout>
 
+
 </RelativeLayout>
+
+
 

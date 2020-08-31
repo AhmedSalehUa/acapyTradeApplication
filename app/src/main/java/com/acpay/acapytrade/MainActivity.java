@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setContentView(R.layout.activity_main);
         FrameLayout framaeLayouat = (FrameLayout) findViewById(R.id.fragment_container);
         ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) framaeLayouat.getLayoutParams();
-        BottomMargin= params.bottomMargin;
+        BottomMargin = params.bottomMargin;
         Dexter.withActivity(this).withPermissions(Arrays.asList(Manifest.permission.FOREGROUND_SERVICE, Manifest.permission.ACCESS_WIFI_STATE)).withListener(new MultiplePermissionsListener() {
             @Override
             public void onPermissionsChecked(MultiplePermissionsReport report) {
@@ -118,9 +118,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Intent noty = this.getIntent();
         String type = noty.getStringExtra("type");
         if (type != null) {
-            if (type.equals("notification")) {
+            if (type.equals("message")) {
                 bottomNav.setSelectedItemId(R.id.nav_bot_messege);
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new MessegeChildsFragment(noty.getStringExtra("sender"))).commit();
+            } else if (type.equals("pended")) {
+                bottomNav.setSelectedItemId(R.id.nav_bot_order);
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new OrderFragment("pended")).commit();
+
+            } else if (type.equals("finished")) {
+                bottomNav.setSelectedItemId(R.id.nav_bot_order);
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new OrderFragment("finished")).commit();
+            } else if (type.equals("ordernotes")) {
+                bottomNav.setSelectedItemId(R.id.nav_bot_order);
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new OrderFragment()).commit();
             }
         } else {
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new OrderFragment()).commit();
@@ -156,7 +166,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         super.onDestroy();
     }
-
 
 
     @Override

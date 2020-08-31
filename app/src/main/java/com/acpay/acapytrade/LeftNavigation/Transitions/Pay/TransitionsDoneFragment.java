@@ -31,6 +31,7 @@ import com.acpay.acapytrade.LeftNavigation.Transitions.Pay.TransitionsApiRespodi
 import com.acpay.acapytrade.LeftNavigation.Transitions.Pay.TransitionsDetails;
 import com.acpay.acapytrade.LeftNavigation.Transitions.Transitions;
 import com.acpay.acapytrade.MainActivity;
+import com.acpay.acapytrade.Navigations.Messages.sendNotification.Data;
 import com.acpay.acapytrade.Networking.JasonReponser;
 import com.acpay.acapytrade.R;
 import com.acpay.acapytrade.SendNotification;
@@ -98,7 +99,8 @@ public class TransitionsDoneFragment extends Fragment {
                                         if (updatea.isFinish()) {
                                             Toast.makeText(getContext(),"done",Toast.LENGTH_SHORT).show();
                                             getFragmentManager().beginTransaction().replace(R.id.transition_container, new TransitionsDoneFragment(bottomNav,name)).commit();
-                                            SendNotification send = new SendNotification(getContext(),getReciverName(name),"تنقلات","تم الغاء التحويل تنقلات " + transitionsDetails.getPlace()+" " + transitionsDetails.getLocation());
+                                            Data data = new Data("تنقلات","تم الغاء التحويل تنقلات " + transitionsDetails.getPlace()+" " + transitionsDetails.getLocation(),"costs");
+                                            SendNotification send = new SendNotification(getContext(),getReciverName(name),data);
 
                                         } else {
                                             handler.postDelayed(this, 100);

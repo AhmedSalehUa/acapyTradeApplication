@@ -40,7 +40,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             Log.d(TAG, "Message data payload: " + remoteMessage.getData());
             JSONObject a = new JSONObject(remoteMessage.getData());
             try {
-                sendNotification(a.getString("user"),a.getString("body"));
+                sendNotification(a.getString("user"),a.getString("body"),a.getString("method"));
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -83,12 +83,34 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
     }
 
+    Intent intent;
+    private void sendNotification(String sender, String message,String method) {
 
-    private void sendNotification(String sender, String message) {
-        Intent intent = new Intent(this, MainActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        intent.putExtra("type","notification");
-        intent.putExtra("sender",sender);
+        switch (method){
+            case "message":
+                intent = new Intent(this, MainActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                intent.putExtra("type","message");
+                intent.putExtra("sender",sender);
+                break;
+            case "pended":
+                intent = new Intent(this, MainActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                intent.putExtra("type","finish");
+                break;
+            case "finished":
+                intent = new Intent(this, MainActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                intent.putExtra("type","pended");
+                break;
+            case "ordernotes":
+                intent = new Intent(this, MainActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                intent.putExtra("type","ordernotes");
+                break;
+        }
+
+
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
                 PendingIntent.FLAG_ONE_SHOT);
 

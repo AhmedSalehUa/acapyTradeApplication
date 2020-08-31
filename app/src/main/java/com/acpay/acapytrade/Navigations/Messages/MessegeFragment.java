@@ -131,10 +131,10 @@ public class MessegeFragment extends Fragment {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 mUsersMessageAdapter.clear();
                 for (DataSnapshot ds : dataSnapshot.getChildren()) {
-
                     MessageUsers user = new MessageUsers(ds.getKey());
                     mUsersMessageAdapter.add(user);
                 }
+
             }
 
             @Override

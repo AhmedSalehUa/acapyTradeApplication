@@ -26,12 +26,13 @@ public  class SendNotification {
     Tokens tok;
     APIService apiService;
     Context mContext;
-    public SendNotification( Context mContext,String receiver, final String username, final String message) {
+    public SendNotification( Context mContext,String receiver,Data data) {
         this.mContext=mContext;
         apiService = Client.getClient("https://fcm.googleapis.com/").create(APIService.class);
-        sendNotifiaction(receiver,username, message);
+
+        sendNotifiaction(receiver,data);
     }
-    private void sendNotifiaction(String receiver, final String username, final String message) {
+    private void sendNotifiaction(String receiver, final Data data) {
 
         DatabaseReference tokens = FirebaseDatabase.getInstance().getReference("tokens").child(receiver);
         ChildEventListener mChildEventListener = new ChildEventListener() {
@@ -40,7 +41,7 @@ public  class SendNotification {
                 tok = snapshot.getValue(Tokens.class);
                 if (tok.getToken() != null) {
                     Log.e("b", tok.getToken());
-                    Data data = new Data(username, message);
+
 
                     Sender sender = new Sender(data, tok.getToken());
 

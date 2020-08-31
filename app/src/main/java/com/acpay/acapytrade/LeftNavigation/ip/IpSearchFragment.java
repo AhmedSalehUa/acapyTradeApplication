@@ -47,7 +47,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class IpSearchFragment extends Fragment {
-    TextView emptyView; 
+    TextView emptyView;
     ListView ipList;
     ProgressBar listProgress;
     Button again, preFixChange;

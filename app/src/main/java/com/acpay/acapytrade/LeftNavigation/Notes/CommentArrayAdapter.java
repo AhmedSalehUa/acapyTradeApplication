@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -44,6 +45,8 @@ public class CommentArrayAdapter extends ECCardContentListItemAdapter<NotesPlace
             viewHolder.devicePassword = (TextView) rowView.findViewById(R.id.deviceContentPass);
             viewHolder.deviceEmail = (TextView) rowView.findViewById(R.id.deviceContentEmail);
             viewHolder.deviceEmailPass = (TextView) rowView.findViewById(R.id.deviceContentEmailPass);
+            viewHolder.shareDevice = (TextView) rowView.findViewById(R.id.shareDevice);
+            viewHolder.deleteDevice = (TextView) rowView.findViewById(R.id.deleteDevice);
             rowView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) rowView.getTag();
@@ -61,6 +64,19 @@ public class CommentArrayAdapter extends ECCardContentListItemAdapter<NotesPlace
             viewHolder.devicePassword.setText(objectItem.getDevicePasswoed());
             viewHolder.deviceEmail.setText(objectItem.getDeviceEmail());
             viewHolder.deviceEmailPass.setText(objectItem.getDeviceEmailPass());
+            viewHolder.shareDevice.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                    Toast.makeText(getContext(),"shareDevice" +  objectItem.getId(),Toast.LENGTH_SHORT).show();
+                }
+            });
+            viewHolder.deleteDevice.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Toast.makeText(getContext(),"deleteDevice" +  objectItem.getId(),Toast.LENGTH_SHORT).show();
+                }
+            });
         }
 
 
@@ -79,6 +95,9 @@ public class CommentArrayAdapter extends ECCardContentListItemAdapter<NotesPlace
         TextView devicePassword;
         TextView deviceEmail;
         TextView deviceEmailPass;
+
+        TextView shareDevice;
+        TextView deleteDevice;
     }
 
 }

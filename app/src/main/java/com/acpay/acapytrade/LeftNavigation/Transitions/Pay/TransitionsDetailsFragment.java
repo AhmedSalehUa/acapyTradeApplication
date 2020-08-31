@@ -21,6 +21,7 @@ import androidx.fragment.app.Fragment;
 
 import com.acpay.acapytrade.LeftNavigation.Transitions.Names.TransitionsNamesFragment;
 import com.acpay.acapytrade.LeftNavigation.Transitions.Transitions;
+import com.acpay.acapytrade.Navigations.Messages.sendNotification.Data;
 import com.acpay.acapytrade.Navigations.Messages.sendNotification.Token;
 import com.acpay.acapytrade.R;
 import com.acpay.acapytrade.SendNotification;
@@ -88,7 +89,8 @@ public class TransitionsDetailsFragment extends Fragment {
                                         if (updatea.isFinish()) {
                                             Toast.makeText(getContext(), "done", Toast.LENGTH_SHORT).show();
                                             getFragmentManager().beginTransaction().replace(R.id.transition_container, new TransitionsDetailsFragment(bottomNav, name)).commit();
-                                            SendNotification send = new SendNotification(getContext(), getReciverName(name), "تنقلات", "تم تحويل تنقلات " + transitionsDetails.getPlace() + " " + transitionsDetails.getLocation());
+                                            Data data = new Data( "تنقلات", "تم تحويل تنقلات " + transitionsDetails.getPlace() + " " + transitionsDetails.getLocation(),"costs");
+                                            SendNotification send = new SendNotification(getContext(), getReciverName(name),data);
                                         } else {
                                             handler.postDelayed(this, 100);
                                         }

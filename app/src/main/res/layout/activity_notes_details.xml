@@ -57,6 +57,21 @@
             android:layout_toEndOf="@id/deviceModel"
             android:layout_toRightOf="@id/deviceModel"
             android:textColor="@android:color/white" />
+        <TextView
+            android:id="@+id/shareDevice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:background="@drawable/ic_share" />
+
+        <TextView
+            android:id="@+id/deleteDevice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/shareDevice"
+            android:layout_alignParentRight="true"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/ic_delete" />
     </RelativeLayout>
 
     <LinearLayout

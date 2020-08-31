@@ -29,14 +29,12 @@ import androidx.loader.content.Loader;
 import com.acpay.acapytrade.AddOrEditeOrderActivity;
 import com.acpay.acapytrade.DeletedActivity;
 import com.acpay.acapytrade.FinishedActivity;
-import com.acpay.acapytrade.MainActivity;
 import com.acpay.acapytrade.OrderOperations.OrderAdapter;
 import com.acpay.acapytrade.PendingRequests;
 import com.acpay.acapytrade.R;
 import com.acpay.acapytrade.OrderOperations.Order;
 import com.acpay.acapytrade.OrderOperations.OrderLoader;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.jpardogo.android.googleprogressbar.library.FoldingCirclesDrawable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,8 +49,23 @@ public class OrderFragment extends Fragment implements LoaderManager.LoaderCallb
 
     ProgressBar progressBar;
     TextView emptyList;
+
     public OrderFragment() {
         super();
+    }
+
+    public OrderFragment(String method) {
+        super();
+        switch (method) {
+            case "pended":
+                Intent intent = new Intent(getContext(), PendingRequests.class);
+                startActivity(intent);
+                break;
+            case "finished":
+                Intent intent3 = new Intent(getContext(), FinishedActivity.class);
+                startActivity(intent3);
+                break;
+        }
     }
 
     @Nullable
@@ -60,9 +73,9 @@ public class OrderFragment extends Fragment implements LoaderManager.LoaderCallb
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.orders_activity, container, false);
         final SwipeRefreshLayout pullToRefresh = rootView.findViewById(R.id.pullToRefresh);
-        progressBar=(ProgressBar)rootView.findViewById(R.id.listProgressOrder);
+        progressBar = (ProgressBar) rootView.findViewById(R.id.listProgressOrder);
 
-        emptyList=(TextView)rootView.findViewById(R.id.listEmptyOrder);
+        emptyList = (TextView) rootView.findViewById(R.id.listEmptyOrder);
         emptyList.setText("جارى التحميل");
         pullToRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -122,7 +135,7 @@ public class OrderFragment extends Fragment implements LoaderManager.LoaderCallb
 
             }
         });
-        ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle("Orders");
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Orders");
         setHasOptionsMenu(true);
         return rootView;
     }

@@ -4,9 +4,6 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -27,27 +24,18 @@ import android.widget.Toast;
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-import androidx.loader.app.LoaderManager;
-import androidx.loader.content.Loader;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.acpay.acapytrade.AddOrEditeOrderActivity;
 import com.acpay.acapytrade.Cordinations.ECBackgroundSwitcherView;
 import com.acpay.acapytrade.Cordinations.ECCardData;
 import com.acpay.acapytrade.Cordinations.ECPagerView;
 import com.acpay.acapytrade.Cordinations.ECPagerViewAdapter;
 import com.acpay.acapytrade.Cordinations.ItemsCountView;
-import com.acpay.acapytrade.LeftNavigation.Transitions.Transitions;
 import com.acpay.acapytrade.MainActivity;
-import com.acpay.acapytrade.Navigations.Order.OrderFragment;
-import com.acpay.acapytrade.Networking.JasonReponser;
-import com.acpay.acapytrade.OrderOperations.OrderLoader;
 import com.acpay.acapytrade.R;
 import com.github.amlcurran.showcaseview.ShowcaseView;
-import com.github.amlcurran.showcaseview.targets.ActionViewTarget;
 import com.github.amlcurran.showcaseview.targets.ViewTarget;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.jpardogo.android.googleprogressbar.library.FoldingCirclesDrawable;
@@ -57,7 +45,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -210,6 +197,20 @@ public class NotesFragment extends Fragment {
                             ImageView avatar = (ImageView) head.findViewById(R.id.avatar);
                             avatar.setImageResource(cardData.getImage());
 
+                            TextView edite=(TextView)head.findViewById(R.id.editeCard);
+                            edite.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    Toast.makeText(getContext(),"edite" + ((NotesPlaces) data).getPlaceId(),Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                            TextView delete=(TextView)head.findViewById(R.id.deleteCard);
+                            delete.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    Toast.makeText(getContext(),"delete" + ((NotesPlaces) data).getPlaceId(),Toast.LENGTH_SHORT).show();
+                                }
+                            });
                             head.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(final View v) {

@@ -172,7 +172,8 @@ public class MessegeChildsFragment extends Fragment {
                 TimeNow = new SimpleDateFormat("hh:mm", Locale.ENGLISH).format(new Date());
                 Message friendlyMessage = new Message(mMessageEditText.getText().toString(), mUsername, null, DateNow, TimeNow, false);
                 mDatabaseReference.push().setValue(friendlyMessage);
-                SendNotification send = new SendNotification(getContext(),targetUserName, mUsername, mMessageEditText.getText().toString());
+                Data data =new Data( mUsername, mMessageEditText.getText().toString(),"message");
+                SendNotification send = new SendNotification(getContext(),targetUserName,data);
                  mMessageEditText.setText("");
             }
         });
@@ -285,7 +286,8 @@ public class MessegeChildsFragment extends Fragment {
                                     DateNow = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH).format(new Date());
                                     TimeNow = new SimpleDateFormat("hh:mm", Locale.ENGLISH).format(new Date());
                                     Message friendlyMessage = new Message(null, mUsername, imageUrl, DateNow, TimeNow, false);
-                                    SendNotification send = new SendNotification(getContext(),targetUserName, mUsername, "photo");
+                                    Data data1=new Data( mUsername, "photo","message");
+                                    SendNotification send = new SendNotification(getContext(),targetUserName,data1);
                                     mDatabaseReference.push().setValue(friendlyMessage);
                                 }
                             });
