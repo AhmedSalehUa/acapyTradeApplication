@@ -27,7 +27,7 @@ public class ECPagerView extends FrameLayout implements ViewPager.OnPageChangeLi
     private ECPager pager;
     private ECBackgroundSwitcherView attachedImageSwitcher;
     private OnCardSelectedListener onCardSelectedListener;
-
+    private OnCardSelectedListener onCardSelectedListenerfrom;
     private boolean needsRedraw;
     private int nextTopMargin = 0;
 
@@ -235,7 +235,13 @@ public class ECPagerView extends FrameLayout implements ViewPager.OnPageChangeLi
             onCardSelectedListener.cardSelected(pager.getCurrentPosition(), pager.getCurrentPosition(), pager.getAdapter().getCount());
 
     }
+    public void setOnCardSelectedListenerfrom(OnCardSelectedListener listener) {
+        this.onCardSelectedListener = listener;
+        if (listener == null) return;
+        if (pager.getAdapter() != null)
+            onCardSelectedListener.cardSelected(pager.getCurrentPosition(), pager.getCurrentPosition(), pager.getAdapter().getCount());
 
+    }
     public int getCardWidth() {
         return cardWidth;
     }

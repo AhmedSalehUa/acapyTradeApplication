@@ -78,19 +78,11 @@ public class NotesFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         rootview = inflater.inflate(R.layout.activity_notes, container, false);
-        final SwipeRefreshLayout pullToRefresh = rootview.findViewById(R.id.notesRefresh);
+
         progressBar = (ProgressBar) rootview.findViewById(R.id.notesProgress);
         progressBar.setIndeterminateDrawable(new FoldingCirclesDrawable.Builder(getContext())
                 .build());
-        pullToRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                progressBar.setVisibility(View.VISIBLE);
-                starting();
-                pullToRefresh.setRefreshing(false);
-                Toast.makeText(getContext(), "Updated", Toast.LENGTH_SHORT).show();
-            }
-        });
+
         notesPlacesListAdd = (FloatingActionButton) rootview.findViewById(R.id.notesPlacesListAdd);
         notesPlacesListAddDetails = (FloatingActionButton) rootview.findViewById(R.id.notesPlacesListAddDetails);
         notesPlacesListAdd.setVisibility(View.VISIBLE);
@@ -146,19 +138,7 @@ public class NotesFragment extends Fragment {
                 List<ECCardData> ecCardData = extractFeuterFromJason(TokenList);
                 if (ecCardData.size() == 0) {
                     progressBar.setVisibility(View.GONE);
-                    RelativeLayout.LayoutParams lps = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                    lps.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-                    lps.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-                    int margin = ((Number) (getResources().getDisplayMetrics().density * 12)).intValue();
-                    lps.setMargins(margin, margin, margin, margin);
-                    ViewTarget target = new ViewTarget(R.id.notesPlacesListAdd, getActivity());
-                    ShowcaseView sv = new ShowcaseView.Builder(getActivity())
-                            .setTarget(target)
-                            .setContentTitle("Add New Place")
-                            .setContentText("use this button to add")
-                            .hideOnTouchOutside()
-                            .build();
-                    sv.setButtonPosition(lps);
+
                 } else {
                     View viewById = rootview.findViewById(R.id.ec_bg_switcher_element);
                     viewById.setForeground(getResources().getDrawable(R.drawable.background_gradient));
@@ -168,7 +148,7 @@ public class NotesFragment extends Fragment {
                         public void instantiateCard(LayoutInflater inflaterService, ViewGroup head, ListView list, final ECCardData data) {
                             cardData = (NotesPlaces) data;
                             List<NotesPlacesDetails> listItems = cardData.getListItems();
-                            CommentArrayAdapter commentArrayAdapter = new CommentArrayAdapter(getActivity().getApplicationContext(), listItems);
+                            CommentArrayAdapter commentArrayAdapter = new CommentArrayAdapter(getContext(), listItems);
                             list.setAdapter(commentArrayAdapter);
                             list.setDivider(getResources().getDrawable(R.drawable.list_divider));
                             list.setDividerHeight((int) pxFromDp(getActivity().getApplicationContext(), 0.5f));
@@ -245,9 +225,17 @@ public class NotesFragment extends Fragment {
                     ecPagerView.setBackgroundSwitcherView((ECBackgroundSwitcherView) rootview.findViewById(R.id.ec_bg_switcher_element));
 
                     final ItemsCountView itemsCountView = (ItemsCountView) rootview.findViewById(R.id.items_count_view);
+                    itemsCountView.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            Log.e("swip","no");
+
+                        }
+                    });
                     ecPagerView.setOnCardSelectedListener(new ECPagerView.OnCardSelectedListener() {
                         @Override
                         public void cardSelected(int newPosition, int oldPosition, int totalElements) {
+                            Log.e("swip","ok");
                             itemsCountView.update(newPosition, oldPosition, totalElements);
 
                         }

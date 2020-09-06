@@ -290,127 +290,129 @@ public class AddOrEditeOrderActivity extends AppCompatActivity {
             case R.id.action_save:
                 if (actionType.equals("add")) {
 
-                    setUPVariables();
-                    setUpApi();
-                    Log.w("addOrder", Api);
-                    final JasonReponser update = new JasonReponser();
-                    update.setFinish(false);
-                    update.execute(Api);
-                    final Handler handler = new Handler();
-                    Runnable runnableCode = new Runnable() {
-                        @Override
-                        public void run() {
-                            if (update.isFinish()) {
-                                String res = update.getUserId();
-                                if (!res.equals("0")) {
-                                    String prodApi = "https://www.app.acapy-trade.com/addProgress.php?order=" + res;
-                                    ArrayList<String> list = new ArrayList<>();
-                                    for (int i = 0; i < progList.getAdapter().getCount(); i++) {
-                                        String val = progList.getAdapter().getItem(i).toString();
-                                        list.add(val);
-                                        prodApi += "&prog[]=" + val;
-                                    }
-                                    final JasonReponser updateProgress = new JasonReponser();
-                                    updateProgress.setFinish(false);
-                                    updateProgress.execute(prodApi);
-                                    final Handler handlerProg = new Handler();
-                                    Runnable runnableCodeProg = new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            if (updateProgress.isFinish()) {
-                                                String res = updateProgress.getUserId();
-                                                if (!res.equals("0")) {
-
-                                                    for (int i = 0; i < checkedColors.length; i++) {
-                                                        boolean checked = checkedColors[i];
-                                                        if (checked) {
-                                                            Data data = new Data( "new order", "تم اضافة اوردر خاص بك","order");
-                                                            SendNotification send = new SendNotification(AddOrEditeOrderActivity.this,getReciverName(usersList.get(i)),data);
-                                                        }
-                                                    }
-                                                    Toast.makeText(AddOrEditeOrderActivity.this, "Saved", Toast.LENGTH_LONG).show();
-                                                    startActivity(new Intent(AddOrEditeOrderActivity.this, MainActivity.class));
-                                                } else {
-                                                    Toast.makeText(AddOrEditeOrderActivity.this, "not saved", Toast.LENGTH_LONG).show();
-                                                }
-                                            } else {
-                                                handlerProg.postDelayed(this, 100);
-                                            }
+                    if (setUPVariables()) {
+                         setUpApi();
+                        Log.w("addOrder", Api);
+                        final JasonReponser update = new JasonReponser();
+                        update.setFinish(false);
+                        update.execute(Api);
+                        final Handler handler = new Handler();
+                        Runnable runnableCode = new Runnable() {
+                            @Override
+                            public void run() {
+                                if (update.isFinish()) {
+                                    String res = update.getUserId();
+                                    if (!res.equals("0")) {
+                                        String prodApi = "https://www.app.acapy-trade.com/addProgress.php?order=" + res;
+                                        ArrayList<String> list = new ArrayList<>();
+                                        for (int i = 0; i < progList.getAdapter().getCount(); i++) {
+                                            String val = progList.getAdapter().getItem(i).toString();
+                                            list.add(val);
+                                            prodApi += "&prog[]=" + val;
                                         }
-                                    };
-                                    handlerProg.post(runnableCodeProg);
+                                        final JasonReponser updateProgress = new JasonReponser();
+                                        updateProgress.setFinish(false);
+                                        updateProgress.execute(prodApi);
+                                        final Handler handlerProg = new Handler();
+                                        Runnable runnableCodeProg = new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                if (updateProgress.isFinish()) {
+                                                    String res = updateProgress.getUserId();
+                                                    if (!res.equals("0")) {
 
+                                                        for (int i = 0; i < checkedColors.length; i++) {
+                                                            boolean checked = checkedColors[i];
+                                                            if (checked) {
+                                                                Data data = new Data("new order", "تم اضافة اوردر خاص بك", "order");
+                                                                SendNotification send = new SendNotification(AddOrEditeOrderActivity.this, getReciverName(usersList.get(i)), data);
+                                                            }
+                                                        }
+                                                        Toast.makeText(AddOrEditeOrderActivity.this, "Saved", Toast.LENGTH_LONG).show();
+                                                        startActivity(new Intent(AddOrEditeOrderActivity.this, MainActivity.class));
+                                                    } else {
+                                                        Toast.makeText(AddOrEditeOrderActivity.this, "not saved", Toast.LENGTH_LONG).show();
+                                                    }
+                                                } else {
+                                                    handlerProg.postDelayed(this, 100);
+                                                }
+                                            }
+                                        };
+                                        handlerProg.post(runnableCodeProg);
+
+                                    } else {
+                                        Toast.makeText(AddOrEditeOrderActivity.this, "not saved", Toast.LENGTH_LONG).show();
+                                    }
                                 } else {
-                                    Toast.makeText(AddOrEditeOrderActivity.this, "not saved", Toast.LENGTH_LONG).show();
+                                    handler.postDelayed(this, 100);
                                 }
-                            } else {
-                                handler.postDelayed(this, 100);
                             }
-                        }
-                    };
-                    handler.post(runnableCode);
+                        };
+                        handler.post(runnableCode);
+                    }
                 } else if (actionType.equals("update")) {
-                    setUPVariables();
-                    setUpApi();
-                    Api += "&orderNum=" + idUpdated;
-                    Log.w("addOrder", Api);
-                    final JasonReponser update = new JasonReponser();
-                    update.setFinish(false);
-                    update.execute(Api + "&orderNum=" + idUpdated);
-                    final Handler handler = new Handler();
-                    Runnable runnableCode = new Runnable() {
-                        @Override
-                        public void run() {
-                            if (update.isFinish()) {
-                                String res = update.getUserId();
-                                if (!res.equals("0")) {
-                                    String prodApi = "https://www.app.acapy-trade.com/addProgress.php?order=" + res;
-                                    ArrayList<String> list = new ArrayList<>();
-                                    for (int i = 0; i < progList.getAdapter().getCount(); i++) {
-                                        String val = progList.getAdapter().getItem(i).toString();
-                                        list.add(val);
-                                        prodApi += "&prog[]=" + val;
-                                    }
-                                    final JasonReponser updateProgress = new JasonReponser();
-                                    updateProgress.setFinish(false);
-                                    updateProgress.execute(prodApi);
-                                    final Handler handlerProg = new Handler();
-                                    Runnable runnableCodeProg = new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            if (updateProgress.isFinish()) {
-                                                String res = updateProgress.getUserId();
-                                                if (!res.equals("0")) {
-                                                    Toast.makeText(AddOrEditeOrderActivity.this, "Saved", Toast.LENGTH_LONG).show();
-
-                                                    for (int i = 0; i < checkedColors.length; i++) {
-                                                        boolean checked = checkedColors[i];
-                                                        if (checked) {
-                                                            Data data =new Data( "new order", "تم تعديل اوردر خاص بك","order");
-                                                            SendNotification send = new SendNotification(AddOrEditeOrderActivity.this, getReciverName(usersList.get(i)),data);
-                                                        }
-                                                    }
-
-                                                    startActivity(new Intent(AddOrEditeOrderActivity.this, MainActivity.class));
-                                                } else {
-                                                    Toast.makeText(AddOrEditeOrderActivity.this, "not saved", Toast.LENGTH_LONG).show();
-                                                }
-                                            } else {
-                                                handlerProg.postDelayed(this, 100);
-                                            }
+                    if (setUPVariables()) {
+                        setUpApi();
+                        Api += "&orderNum=" + idUpdated;
+                        Log.w("addOrder", Api);
+                        final JasonReponser update = new JasonReponser();
+                        update.setFinish(false);
+                        update.execute(Api + "&orderNum=" + idUpdated);
+                        final Handler handler = new Handler();
+                        Runnable runnableCode = new Runnable() {
+                            @Override
+                            public void run() {
+                                if (update.isFinish()) {
+                                    String res = update.getUserId();
+                                    if (!res.equals("0")) {
+                                        String prodApi = "https://www.app.acapy-trade.com/addProgress.php?order=" + res;
+                                        ArrayList<String> list = new ArrayList<>();
+                                        for (int i = 0; i < progList.getAdapter().getCount(); i++) {
+                                            String val = progList.getAdapter().getItem(i).toString();
+                                            list.add(val);
+                                            prodApi += "&prog[]=" + val;
                                         }
-                                    };
-                                    handlerProg.post(runnableCodeProg);
+                                        final JasonReponser updateProgress = new JasonReponser();
+                                        updateProgress.setFinish(false);
+                                        updateProgress.execute(prodApi);
+                                        final Handler handlerProg = new Handler();
+                                        Runnable runnableCodeProg = new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                if (updateProgress.isFinish()) {
+                                                    String res = updateProgress.getUserId();
+                                                    if (!res.equals("0")) {
+                                                        Toast.makeText(AddOrEditeOrderActivity.this, "Saved", Toast.LENGTH_LONG).show();
 
+                                                        for (int i = 0; i < checkedColors.length; i++) {
+                                                            boolean checked = checkedColors[i];
+                                                            if (checked) {
+                                                                Data data = new Data("new order", "تم تعديل اوردر خاص بك", "order");
+                                                                SendNotification send = new SendNotification(AddOrEditeOrderActivity.this, getReciverName(usersList.get(i)), data);
+                                                            }
+                                                        }
+
+                                                        startActivity(new Intent(AddOrEditeOrderActivity.this, MainActivity.class));
+                                                    } else {
+                                                        Toast.makeText(AddOrEditeOrderActivity.this, "not saved", Toast.LENGTH_LONG).show();
+                                                    }
+                                                } else {
+                                                    handlerProg.postDelayed(this, 100);
+                                                }
+                                            }
+                                        };
+                                        handlerProg.post(runnableCodeProg);
+
+                                    } else {
+                                        Toast.makeText(AddOrEditeOrderActivity.this, "not saved", Toast.LENGTH_LONG).show();
+                                    }
                                 } else {
-                                    Toast.makeText(AddOrEditeOrderActivity.this, "not saved", Toast.LENGTH_LONG).show();
+                                    handler.postDelayed(this, 100);
                                 }
-                            } else {
-                                handler.postDelayed(this, 100);
                             }
-                        }
-                    };
-                    handler.post(runnableCode);
+                        };
+                        handler.post(runnableCode);
+                    }
                 }
                 return true;
         }
@@ -434,17 +436,33 @@ public class AddOrEditeOrderActivity extends AppCompatActivity {
     }
 
 
-
-    private void setUPVariables() {
+    private boolean setUPVariables() {
         placeVal = place.getText().toString();
         locationVal = location.getText().toString();
-        dateVal = date.getText().toString();
+        if (date.getText().toString().length() == 0) {
+            AlertDialog.Builder alertDialog = new AlertDialog.Builder(AddOrEditeOrderActivity.this);
+            alertDialog.setTitle("خطا");
+            alertDialog.setMessage("برجاء ادخال التاريخ");
+            alertDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int whichButton) {
+                    Toast.makeText(AddOrEditeOrderActivity.this, "canceled", Toast.LENGTH_SHORT).show();
+                }
+            });
+            alertDialog.show();
+            Log.e("log", "false");
+            return false;
+        } else {
+            Log.e("log", String.valueOf(date.getText().toString().length()));
+            dateVal = date.getText().toString();
+        }
+
         timeVal = time.getText().toString();
         matterVal = matter.getText().toString();
         filesVal = files.getText().toString();
         notesVal = notes.getText().toString();
         fixtrypeVal = fixtrype.getText().toString();
         dlivercostVal = dlivercost.getText().toString();
+        return true;
     }
 
     private void extractFeuterFromJason(String jason) {
@@ -558,7 +576,8 @@ public class AddOrEditeOrderActivity extends AppCompatActivity {
     }
 
     public void setUsersList(View view) {
-        usernames.setText("");matter.setText("");
+        usernames.setText("");
+        matter.setText("");
         AlertDialog.Builder builder = new AlertDialog.Builder(AddOrEditeOrderActivity.this);
         String[] colors = new String[]{
                 "Ahmed",
@@ -625,12 +644,17 @@ public class AddOrEditeOrderActivity extends AppCompatActivity {
         // Display the alert dialog on interface
         dialog.show();
     }
+
     private String getId(String s) {
-        switch (s){
-            case "Ahmed": return "3grT34bqUdSG4WHVYFRuxDaIm1I3";
-            case "Mohamed": return "aRisjHAS36R5qrvXgAO8fpNIiLE3";
-            case "Remon": return "xHIE6dwSIwQB8rm3geTBzfJdN0r2";
-            case "George": return "CREjud2a6YXajLzJJTtHqttthgp1";
+        switch (s) {
+            case "Ahmed":
+                return "3grT34bqUdSG4WHVYFRuxDaIm1I3";
+            case "Mohamed":
+                return "aRisjHAS36R5qrvXgAO8fpNIiLE3";
+            case "Remon":
+                return "xHIE6dwSIwQB8rm3geTBzfJdN0r2";
+            case "George":
+                return "CREjud2a6YXajLzJJTtHqttthgp1";
         }
         return "";
     }
