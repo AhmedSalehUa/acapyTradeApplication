@@ -3,10 +3,11 @@ package com.acpay.acapytrade.LeftNavigation.Notes;
 import com.acpay.acapytrade.Cordinations.ECCardData;
 import com.acpay.acapytrade.R;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Random;
 
-public class NotesPlaces implements ECCardData<NotesPlacesDetails> {
+public class NotesPlaces implements ECCardData<NotesPlacesDetails>{
     private String placeId;
     private String palaceName;
     private String palaceLocation;

@@ -7,26 +7,31 @@
 
     android:padding="@dimen/activity_margin"
     tools:context=".AddOrEditeOrderActivity">
+
     <LinearLayout
-        android:orientation="vertical"
-        android:padding="16dp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
+
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:orientation="vertical">
+
                 <TextView
                     style="@style/CategoryStyle"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="1"
                     android:text="@string/addOrder_place" />
+
                 <TextView
                     style="@style/CategoryStyle"
                     android:layout_width="match_parent"
@@ -34,6 +39,7 @@
                     android:layout_weight="1"
                     android:text="@string/addOrder_location" />
             </LinearLayout>
+
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -70,38 +76,74 @@
                 android:layout_height="match_parent"
                 android:layout_weight="2"
                 android:orientation="horizontal">
+
                 <TextView
                     android:id="@+id/usersname"
                     android:layout_width="wrap_content"
-                    android:layout_toLeftOf="@id/bt"
-                    android:layout_height="match_parent"/>
+                    android:layout_height="match_parent"
+                    android:layout_toLeftOf="@id/bt" />
+
                 <Button
                     android:id="@+id/bt"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
                     android:onClick="setUsersList"
-                    android:text="@string/choose"/>
+                    android:text="@string/choose" />
 
             </RelativeLayout>
         </LinearLayout>
+
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="120dp"
             android:orientation="horizontal">
+
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:orientation="vertical">
+
                 <TextView
                     style="@style/CategoryStyle"
-                    android:textAlignment="center"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="1"
+                    android:gravity="center_horizontal"
                     android:text="@string/addOrder_fix"
-                    android:gravity="center_horizontal" />
+                    android:textAlignment="center" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="2"
+                android:orientation="vertical"
+                android:paddingLeft="4dp">
+
+                <EditText
+                    android:layout_height="match_parent"
+                    android:id="@+id/addorder_fix"
+                    style="@style/EditorFieldStyle"
+                    android:hint="@string/addOrder_fix"
+                    android:inputType="textMultiLine" />
+
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
                 <TextView
                     style="@style/CategoryStyle"
                     android:layout_width="match_parent"
@@ -109,17 +151,14 @@
                     android:layout_weight="1"
                     android:text="@string/addOrder_dliverCost" />
             </LinearLayout>
+
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="2"
                 android:orientation="vertical"
                 android:paddingLeft="4dp">
-                <EditText
-                    android:id="@+id/addorder_fix"
-                    style="@style/EditorFieldStyle"
-                    android:hint="@string/addOrder_fix"
-                    android:inputType="textCapWords" />
+
                 <EditText
                     android:id="@+id/addorder_dliverCost"
                     style="@style/EditorFieldStyle"
@@ -127,21 +166,25 @@
                     android:inputType="textCapWords" />
             </LinearLayout>
         </LinearLayout>
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
+
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:orientation="vertical">
+
                 <TextView
                     style="@style/CategoryStyle"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="1"
                     android:text="@string/addOrder_date" />
+
                 <TextView
                     style="@style/CategoryStyle"
                     android:layout_width="match_parent"
@@ -149,23 +192,27 @@
                     android:layout_weight="1"
                     android:text="@string/addOrder_time" />
             </LinearLayout>
+
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="2"
                 android:orientation="vertical"
                 android:paddingLeft="4dp">
+
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingLeft="4dp">
+
                     <EditText
                         android:id="@+id/addorder_date"
                         style="@style/EditorFieldStyle"
-                        android:textStyle="bold"
-                        android:textColor="@android:color/black"
                         android:layout_marginRight="50dp"
-                        android:hint="@string/addOrder_date" />
+                        android:hint="@string/addOrder_date"
+                        android:textColor="@android:color/black"
+                        android:textStyle="bold" />
+
                     <ImageView
                         android:id="@+id/addorder_date_add"
                         android:layout_width="50dp"
@@ -173,6 +220,7 @@
                         android:layout_alignParentRight="true"
                         android:background="@drawable/ic_baseline_date_range_36" />
                 </RelativeLayout>
+
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -182,9 +230,9 @@
                         android:id="@+id/addorder_time"
                         style="@style/EditorFieldStyle"
                         android:layout_marginRight="50dp"
-                        android:textStyle="bold"
+                        android:hint="@string/addOrder_time"
                         android:textColor="@android:color/black"
-                        android:hint="@string/addOrder_time" />
+                        android:textStyle="bold" />
 
                     <ImageView
                         android:id="@+id/addorder_time_add"
@@ -201,17 +249,20 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
+
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:orientation="vertical">
+
                 <TextView
                     style="@style/CategoryStyle"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="1"
                     android:text="@string/Num_of_matter" />
+
                 <TextView
                     style="@style/CategoryStyle"
                     android:layout_width="match_parent"
@@ -220,17 +271,20 @@
                     android:text="@string/addOrder_file" />
 
             </LinearLayout>
+
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="2"
                 android:orientation="vertical"
                 android:paddingLeft="4dp">
+
                 <EditText
                     android:id="@+id/addorder_matter"
                     style="@style/EditorFieldStyle"
                     android:hint="@string/Num_of_matter"
                     android:inputType="textCapWords" />
+
                 <EditText
                     android:id="@+id/addorder_files"
                     style="@style/EditorFieldStyle"
@@ -239,15 +293,18 @@
 
             </LinearLayout>
         </LinearLayout>
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="120dp"
             android:orientation="horizontal">
+
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:orientation="vertical">
+
                 <TextView
                     style="@style/CategoryStyle"
                     android:layout_width="match_parent"
@@ -255,12 +312,14 @@
                     android:layout_weight="1"
                     android:text="@string/addOrder_Notes" />
             </LinearLayout>
+
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="2"
                 android:orientation="vertical"
                 android:paddingLeft="4dp">
+
                 <EditText
                     android:id="@+id/addorder_notes"
                     style="@style/EditorFieldStyle"
@@ -269,15 +328,18 @@
                     android:inputType="textMultiLine" />
             </LinearLayout>
         </LinearLayout>
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
+
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:orientation="vertical">
+
                 <TextView
                     style="@style/CategoryStyle"
                     android:layout_width="match_parent"
@@ -285,12 +347,14 @@
                     android:layout_weight="1"
                     android:text="@string/addOrder_progress" />
             </LinearLayout>
+
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="2"
                 android:orientation="vertical"
                 android:paddingLeft="4dp">
+
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -300,9 +364,9 @@
                         android:id="@+id/addorder_progItem"
                         style="@style/EditorFieldStyle"
                         android:layout_marginRight="80dp"
-                        android:textStyle="bold"
+                        android:hint="@string/addOrder_item"
                         android:textColor="@android:color/black"
-                        android:hint="@string/addOrder_item" />
+                        android:textStyle="bold" />
 
                     <ImageView
                         android:id="@+id/addorder_time_add_prog"
@@ -310,6 +374,7 @@
                         android:layout_height="50dp"
                         android:layout_alignParentRight="true"
                         android:background="@drawable/ic_add" />
+
                     <ImageView
                         android:id="@+id/addorder_time_remove_prog"
                         android:layout_width="40dp"
@@ -317,10 +382,11 @@
                         android:layout_toLeftOf="@id/addorder_time_add_prog"
                         android:background="@drawable/ic_baseline_close_24" />
                 </RelativeLayout>
+
                 <ListView
                     android:id="@+id/listOfProgress"
                     android:layout_width="match_parent"
-                    android:layout_height="250dp"/>
+                    android:layout_height="250dp" />
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>

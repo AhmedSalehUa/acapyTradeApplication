@@ -31,7 +31,7 @@ import java.util.List;
 
 public class OrderFinished extends Fragment implements LoaderManager.LoaderCallbacks<List<Order>> {
     String uid;
-    private String ApiUrl = " https://www.app.acapy-trade.com/orders.php?type=no";
+    private String ApiUrl = "https://www.app.acapy-trade.com/orders.php?type=no";
 
     OrderAdapter adapter;
     TextView State;

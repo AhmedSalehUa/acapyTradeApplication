@@ -97,8 +97,13 @@ public class CommentArrayAdapter extends ECCardContentListItemAdapter<NotesPlace
             viewHolder.deleteDevice.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+                    final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                    builder.setMessage("سيتم حذف الجهاز هل انت متاكد؟")
+                            .setCancelable(false)
+                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
 
-                    String api = "https://www.app.acapy-trade.com/deleteNotesDetails.php?id=" + objectItem.getId();
+                                    String api = "https://www.app.acapy-trade.com/deleteNotesDetails.php?id=" + objectItem.getId();
                     final NotesResponser update = new NotesResponser();
                     update.setFinish(false);
                     update.execute(api);
@@ -119,7 +124,15 @@ public class CommentArrayAdapter extends ECCardContentListItemAdapter<NotesPlace
                         }
                     };
                     handler.postDelayed(runnableCode, 1000);
-                    handler.post(runnableCode);
+                    handler.post(runnableCode); }
+                            })
+                            .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                public void onClick(final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                                    dialog.cancel();
+                                }
+                            });
+                    final AlertDialog alert = builder.create();
+                    alert.show();
                 }
             });
 

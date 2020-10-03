@@ -34,6 +34,7 @@ import com.acpay.acapytrade.Navigations.Messages.sendNotification.Token;
 import com.acpay.acapytrade.Networking.JasonReponser;
 import com.acpay.acapytrade.OrderOperations.Order;
 import com.acpay.acapytrade.OrderOperations.orderReponser;
+import com.acpay.acapytrade.OrderOperations.progress.boxes;
 import com.acpay.acapytrade.OrderOperations.progressReponser;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DatabaseReference;
@@ -132,8 +133,8 @@ public class AddOrEditeOrderActivity extends AppCompatActivity {
             }
         };
         handler.post(runnableCode);
-        pickedDate.setEnabled(false);
-        pickedTime.setEnabled(false);
+//        pickedDate.setEnabled(false);
+//        pickedTime.setEnabled(false);
         final ImageView datePicker = (ImageView) findViewById(R.id.addorder_date_add);
         datePicker.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -142,10 +143,6 @@ public class AddOrEditeOrderActivity extends AppCompatActivity {
                 mYear = c.get(Calendar.YEAR);
                 mMonth = c.get(Calendar.MONTH);
                 mDay = c.get(Calendar.DAY_OF_MONTH);
-                long today = c.getTimeInMillis();
-                final long oneDay = 24 * 60 * 60 * 1000L;
-                Date previousDays = new Date(today - 1000);
-                Date nextMonth = new Date(today + 30 * oneDay);
                 DatePickerDialog datePickerDialog = new DatePickerDialog(AddOrEditeOrderActivity.this,
                         new DatePickerDialog.OnDateSetListener() {
 
@@ -155,8 +152,7 @@ public class AddOrEditeOrderActivity extends AppCompatActivity {
                                 pickedDate.setText(year + "-" + (monthOfYear + 1) + "-" + dayOfMonth);
                             }
                         }, mYear, mMonth, mDay);
-                datePickerDialog.getDatePicker().setMinDate(today);
-                datePickerDialog.getDatePicker().setMaxDate(today * oneDay * 3);
+
                 datePickerDialog.show();
             }
         });
@@ -481,7 +477,7 @@ public class AddOrEditeOrderActivity extends AppCompatActivity {
                         jsonArrayId.getString("num_of_matter"),
                         jsonArrayId.getString("dliverCost"),
                         jsonArrayId.getString("notes"),
-                        jsonArrayId.getString("files"), jsonArrayId.getString("username")
+                        jsonArrayId.getString("files"), jsonArrayId.getString("username"),new ArrayList<boxes>()
                 );
                 place.setText(jsonArrayId.getString("place"));
                 location.setText(jsonArrayId.getString("location"));
