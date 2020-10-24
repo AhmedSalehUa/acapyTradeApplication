@@ -104,27 +104,28 @@ public class CommentArrayAdapter extends ECCardContentListItemAdapter<NotesPlace
                                 public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
 
                                     String api = "https://www.app.acapy-trade.com/deleteNotesDetails.php?id=" + objectItem.getId();
-                    final NotesResponser update = new NotesResponser();
-                    update.setFinish(false);
-                    update.execute(api);
-                    final Handler handler = new Handler();
-                    Runnable runnableCode = new Runnable() {
-                        @SuppressLint("NewApi")
-                        @Override
-                        public void run() {
-                            if (update.isFinish()) {
-                                if (update.getUserId().contains("1")) {
-                                    Toast.makeText(getContext(), "Deleted", Toast.LENGTH_SHORT).show();
-                                    a.startActivity(new Intent(a,MainActivity.class));
-                                } else {
+                                    final NotesResponser update = new NotesResponser();
+                                    update.setFinish(false);
+                                    update.execute(api);
+                                    final Handler handler = new Handler();
+                                    Runnable runnableCode = new Runnable() {
+                                        @SuppressLint("NewApi")
+                                        @Override
+                                        public void run() {
+                                            if (update.isFinish()) {
+                                                if (update.getUserId().contains("1")) {
+                                                    Toast.makeText(getContext(), "Deleted", Toast.LENGTH_SHORT).show();
+                                                    a.startActivity(new Intent(a, MainActivity.class));
+                                                } else {
+                                                }
+                                            } else {
+                                                handler.postDelayed(this, 100);
+                                            }
+                                        }
+                                    };
+                                    handler.postDelayed(runnableCode, 1000);
+                                    handler.post(runnableCode);
                                 }
-                            } else {
-                                handler.postDelayed(this, 100);
-                            }
-                        }
-                    };
-                    handler.postDelayed(runnableCode, 1000);
-                    handler.post(runnableCode); }
                             })
                             .setNegativeButton("No", new DialogInterface.OnClickListener() {
                                 public void onClick(final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
@@ -167,10 +168,12 @@ public class CommentArrayAdapter extends ECCardContentListItemAdapter<NotesPlace
                 "Ahmed Saleh",
                 "Mohamed Hammad",
                 "Remon",
-                "George Elgndy"
+                "George Elgndy",
+                "external"
         };
 
         checkedColors = new boolean[]{
+                false,
                 false,
                 false,
                 false,
@@ -201,7 +204,9 @@ public class CommentArrayAdapter extends ECCardContentListItemAdapter<NotesPlace
                 for (int i = 0; i < checkedColors.length; i++) {
                     boolean checked = checkedColors[i];
                     if (checked) {
+
                         ReciverName = usersList.get(i);
+
                     }
                 }
                 String message = "Device Name: " + objectItem.getDeviceName() + "\n"
@@ -211,17 +216,24 @@ public class CommentArrayAdapter extends ECCardContentListItemAdapter<NotesPlace
                         + "Device Ip: " + objectItem.getDeviceIp() + "\n"
                         + "Device Port: " + objectItem.getDevicePort() + "\n"
                         + "Device Username: " + objectItem.getDeviceUsername() + "\n"
-                        + "Device Passwoed: " + objectItem.getDevicePasswoed() + "\n"
+                        + "Device Password: " + objectItem.getDevicePasswoed() + "\n"
                         + "Device Email: " + objectItem.getDeviceEmail() + "\n"
                         + "Device EmailPass: " + objectItem.getDeviceEmailPass();
                 String DateNow = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH).format(new Date());
                 String TimeNow = new SimpleDateFormat("hh:mm", Locale.ENGLISH).format(new Date());
-                String sender=FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
-                Message friendlyMessage = new Message(message, sender, null, DateNow, TimeNow, false);
-                FirebaseDatabase.getInstance().getReference().child("messages").child(ReciverName).push().setValue(friendlyMessage);
-                Data data =new Data( sender, message,"message");
-                SendNotification send = new SendNotification(getContext(),ReciverName,data);
-
+                if (ReciverName.equals("external")) {
+                    Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+                    sharingIntent.setType("text/plain");
+                    sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Device Details");
+                    sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, message);
+                    getContext().startActivity(Intent.createChooser(sharingIntent, "Share text via"));
+                } else {
+                    String sender = FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
+                    Message friendlyMessage = new Message(message, sender, null, DateNow, TimeNow, false);
+                    FirebaseDatabase.getInstance().getReference().child("messages").child(ReciverName).push().setValue(friendlyMessage);
+                    Data data = new Data(sender, message, "message");
+                    SendNotification send = new SendNotification(getContext(), ReciverName, data);
+                }
             }
         });
 
