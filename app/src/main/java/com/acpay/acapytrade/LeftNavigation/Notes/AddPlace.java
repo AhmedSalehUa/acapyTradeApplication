@@ -1,20 +1,24 @@
 package com.acpay.acapytrade.LeftNavigation.Notes;
 
+import static com.acpay.acapytrade.MainActivity.getAPIHEADER;
+
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.acpay.acapytrade.Networking.JasonReponser;
 import com.acpay.acapytrade.R;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.muddzdev.styleabletoast.StyleableToast;
 
 public class AddPlace extends AppCompatActivity {
@@ -55,58 +59,68 @@ public class AddPlace extends AppCompatActivity {
         return true;
     }
 
-    AddResponser update;
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_save:
                 if (actionType.equals("add")) {
-                    update = new AddResponser();
-                    update.setFinish(false);
-                    update.execute("https://www.app.acapy-trade.com/addNotesPlace.php?name=" + name.getText().toString() + "&location=" + location.getText().toString() + "&details=" + details.getText().toString());
-                    final Handler handler = new Handler();
-                    Runnable runnableCode = new Runnable() {
-                        @Override
-                        public void run() {
-                            if (update.isFinish()) {
-                                String res = update.getUserId();
-                                if (!res.equals("0")) {
-                                    new StyleableToast.Builder(AddPlace.this).text("Saved").iconStart(R.drawable.ic_save).backgroundColor(getResources().getColor(android.R.color.holo_green_light)).show();
-                                    onBackPressed();
-                                } else {
-                                    new StyleableToast.Builder(AddPlace.this).text("Not Saved!").iconStart(R.drawable.falied).backgroundColor(getResources().getColor(android.R.color.holo_red_dark)).show();
-                                    onBackPressed();
+                    String api = getAPIHEADER(AddPlace.this) + "/addNotesPlace.php?name=" + name.getText().toString() + "&location=" + location.getText().toString() + "&details=" + details.getText().toString();
+                    RequestQueue queue = Volley.newRequestQueue(AddPlace.this);
+                    StringRequest stringRequest = new StringRequest(Request.Method.GET, api,
+                            new Response.Listener<String>() {
+                                @Override
+                                public void onResponse(String response) {
+                                    String res = response;
+                                    if (!res.equals("0")) {
+                                        new StyleableToast.Builder(AddPlace.this).text("Saved").iconStart(R.drawable.ic_save).backgroundColor(getResources().getColor(android.R.color.holo_green_light)).show();
+                                        onBackPressed();
+                                    } else {
+                                        new StyleableToast.Builder(AddPlace.this).text("Not Saved!").iconStart(R.drawable.falied).backgroundColor(getResources().getColor(android.R.color.holo_red_dark)).show();
+                                        onBackPressed();
+                                    }
                                 }
-                            } else {
-                                handler.postDelayed(this, 100);
-                            }
+                            }, new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+
+                            Log.e("onResponse", error.toString());
                         }
-                    };
-                    handler.post(runnableCode);
+                    });
+                    stringRequest.setShouldCache(false);
+                    stringRequest.setShouldRetryConnectionErrors(true);
+                    stringRequest.setShouldRetryServerErrors(true);
+                    queue.add(stringRequest);
+
                 } else if (actionType.equals("update")) {
-                    update = new AddResponser();
-                    update.setFinish(false);
-                    update.execute("https://www.app.acapy-trade.com/updateNotesPlace.php?id="+idUpdated+"&name=" + name.getText().toString() + "&location=" + location.getText().toString() + "&details=" + details.getText().toString());
-                    final Handler handler = new Handler();
-                    Runnable runnableCode = new Runnable() {
-                        @Override
-                        public void run() {
-                            if (update.isFinish()) {
-                                String res = update.getUserId();
-                                if (!res.equals("0")) {
-                                    new StyleableToast.Builder(AddPlace.this).text("Saved").iconStart(R.drawable.ic_save).backgroundColor(getResources().getColor(android.R.color.holo_green_light)).show();
-                                    onBackPressed();
-                                } else {
-                                    new StyleableToast.Builder(AddPlace.this).text("Not Saved!").iconStart(R.drawable.falied).backgroundColor(getResources().getColor(android.R.color.holo_red_dark)).show();
-                                    onBackPressed();
+
+                    String api = getAPIHEADER(AddPlace.this) + "/updateNotesPlace.php?id=" + idUpdated + "&name=" + name.getText().toString() + "&location=" + location.getText().toString() + "&details=" + details.getText().toString();
+                    RequestQueue queue = Volley.newRequestQueue(AddPlace.this);
+                    StringRequest stringRequest = new StringRequest(Request.Method.GET, api,
+                            new Response.Listener<String>() {
+                                @Override
+                                public void onResponse(String response) {
+                                    String res = response;
+                                    if (!res.equals("0")) {
+                                        new StyleableToast.Builder(AddPlace.this).text("Saved").iconStart(R.drawable.ic_save).backgroundColor(getResources().getColor(android.R.color.holo_green_light)).show();
+                                        onBackPressed();
+                                    } else {
+                                        new StyleableToast.Builder(AddPlace.this).text("Not Saved!").iconStart(R.drawable.falied).backgroundColor(getResources().getColor(android.R.color.holo_red_dark)).show();
+                                        onBackPressed();
+                                    }
                                 }
-                            } else {
-                                handler.postDelayed(this, 100);
-                            }
+                            }, new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+
+                            Log.e("onResponse", error.toString());
                         }
-                    };
-                    handler.post(runnableCode);
+                    });
+                    stringRequest.setShouldCache(false);
+                    stringRequest.setShouldRetryConnectionErrors(true);
+                    stringRequest.setShouldRetryServerErrors(true);
+                    queue.add(stringRequest);
+
                 }
         }
         return true;

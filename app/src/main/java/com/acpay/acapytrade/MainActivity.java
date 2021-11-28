@@ -10,7 +10,9 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -20,6 +22,7 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import com.acpay.acapytrade.LeftNavigation.Notes.NotesFragment;
+import com.acpay.acapytrade.LeftNavigation.StaticIp.StaticIp;
 import com.acpay.acapytrade.LeftNavigation.Transitions.TransitionsFragment;
 import com.acpay.acapytrade.LeftNavigation.ip.IpSearchFragment;
 import com.acpay.acapytrade.Navigations.HomeFragment;
@@ -58,17 +61,30 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     private BottomNavigationView bottomNav;
+
+//    public static final String APIHEADER = "http://41.178.166.110/acapy-trade/app";
     NavigationView navigationView;
     private DrawerLayout drawer;
     FirebaseUser user;
     String token;
     int countMessage = 0;
     int BottomMargin;
-
+    public static String getAPIHEADER(Context athis) {
+        if (athis == null) {
+            Log.e("api", "error");
+        }
+        SharedPreferences sharedPreferences = athis.getSharedPreferences("MainActivity", MODE_PRIVATE);
+        return sharedPreferences.getString("api", "http://41.178.166.108/acapy-trade/app");
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        SharedPreferences sharedPreferences = this.getSharedPreferences("MainActivity", MODE_PRIVATE);
+        if(sharedPreferences.getString("api", "no").equals("no")){
+            sharedPreferences.edit().putString("api", "http://41.178.166.108/acapy-trade/app");
+            sharedPreferences.edit().commit();
+        }
         FrameLayout framaeLayouat = (FrameLayout) findViewById(R.id.fragment_container);
         ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) framaeLayouat.getLayoutParams();
         BottomMargin = params.bottomMargin;
@@ -193,6 +209,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             case R.id.lef_nav_notes:
                 FrameLayout framaeLayout = (FrameLayout) findViewById(R.id.fragment_container);
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new NotesFragment(framaeLayout)).commit();
+                bottomNav.setVisibility(View.INVISIBLE);
+                break;
+            case R.id.lef_nav_static_ip:
+                FrameLayout framaesLayout = (FrameLayout) findViewById(R.id.fragment_container);
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new StaticIp(framaesLayout)).commit();
+                bottomNav.setVisibility(View.INVISIBLE);
+                break;
+            case R.id.lef_nav_sales:
+                FrameLayout frameSalesLayout = (FrameLayout) findViewById(R.id.fragment_container);
+//                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new Sales(frameSalesLayout)).commit();
                 bottomNav.setVisibility(View.INVISIBLE);
                 break;
 

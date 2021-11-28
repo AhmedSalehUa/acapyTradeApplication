@@ -27,17 +27,7 @@ public class locationUtilies {
         super();
     }
 
-    public static List<location> fetchData(String url) {
-        URL urlR = getUrl(url);
-        String jasonResponse = null;
-        try {
-            jasonResponse = getHttpRequest(urlR);
-        } catch (IOException e) {
-            Log.e(LOG_TAG, "Problem making the HTTP request.", e);
-        }
-        List<location> books = extractFeuterFromJason(jasonResponse);
-        return books;
-    }
+
 
     public static List<location> extractFeuterFromJason(String jason) {
         final List<location> list = new ArrayList<>();

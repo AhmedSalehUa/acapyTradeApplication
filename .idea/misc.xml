@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="..\:/projects/Implementation for institutions/Acapy Trade Applications/AcapyTrade/app/src/main/res/layout/activity_main.xml" value="0.14402173913043478" />
+        <entry key="..\:/projects/Implementation for institutions/Acapy Trade Applications/AcapyTrade/app/src/main/res/layout/activity_transitions.xml" value="0.33958333333333335" />
+        <entry key="..\:/projects/Implementation for institutions/Acapy Trade Applications/AcapyTrade/app/src/main/res/layout/activity_transitions_details.xml" value="0.33958333333333335" />
+        <entry key="..\:/projects/Implementation for institutions/Acapy Trade Applications/AcapyTrade/app/src/main/res/layout/activity_transitions_details_items_content.xml" value="0.33958333333333335" />
+        <entry key="..\:/projects/Implementation for institutions/Acapy Trade Applications/AcapyTrade/app/src/main/res/layout/activity_transitions_details_items_content_list.xml" value="0.33958333333333335" />
+        <entry key="..\:/projects/Implementation for institutions/Acapy Trade Applications/AcapyTrade/app/src/main/res/layout/activity_transitions_names.xml" value="0.33958333333333335" />
+        <entry key="..\:/projects/Implementation for institutions/Acapy Trade Applications/AcapyTrade/app/src/main/res/layout/activity_transitions_names_item.xml" value="0.33958333333333335" />
+        <entry key="..\:/projects/Implementation for institutions/Acapy Trade Applications/AcapyTrade/app/src/main/res/layout/addorder_activity.xml" value="0.20606884057971014" />
+        <entry key="..\:/projects/Implementation for institutions/Acapy Trade Applications/AcapyTrade/app/src/main/res/layout/orders_activity.xml" value="0.11594202898550725" />
+        <entry key="..\:/projects/Implementation for institutions/Acapy Trade Applications/AcapyTrade/app/src/main/res/layout/pending_activity.xml" value="0.1546875" />
+        <entry key="..\:/projects/Implementation for institutions/Acapy Trade Applications/AcapyTrade/app/src/main/res/menu/bottom_nav.xml" value="0.2" />
+        <entry key="..\:/projects/Implementation for institutions/Acapy Trade Applications/AcapyTrade/app/src/main/res/menu/menu_catalog.xml" value="0.2046875" />
+      </map>
+    </option>
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" project-jdk-name="1.8" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/build/classes" />
+  </component>
+  <component name="ProjectType">
+    <option name="id" value="Android" />
+  </component>
+</project>

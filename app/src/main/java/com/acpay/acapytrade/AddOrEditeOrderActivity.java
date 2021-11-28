@@ -1,12 +1,13 @@
 package com.acpay.acapytrade;
 
+import static com.acpay.acapytrade.MainActivity.getAPIHEADER;
+
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
@@ -31,11 +32,14 @@ import com.acpay.acapytrade.Navigations.Messages.sendNotification.APIService;
 import com.acpay.acapytrade.Navigations.Messages.sendNotification.Client;
 import com.acpay.acapytrade.Navigations.Messages.sendNotification.Data;
 import com.acpay.acapytrade.Navigations.Messages.sendNotification.Token;
-import com.acpay.acapytrade.Networking.JasonReponser;
 import com.acpay.acapytrade.OrderOperations.Order;
-import com.acpay.acapytrade.OrderOperations.orderReponser;
 import com.acpay.acapytrade.OrderOperations.progress.boxes;
-import com.acpay.acapytrade.OrderOperations.progressReponser;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -88,7 +92,6 @@ public class AddOrEditeOrderActivity extends AppCompatActivity {
         idUpdated = data.getStringExtra("id");
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         mDatabaseReference = mFirebaseDatabase.getReference().child("orders");
-        // userIdSpinner = (Spinner) findViewById(R.id.spinner_gender);
         place = (EditText) findViewById(R.id.addorder_place);
         location = (EditText) findViewById(R.id.addorder_location);
         date = (EditText) findViewById(R.id.addorder_date);
@@ -114,27 +117,27 @@ public class AddOrEditeOrderActivity extends AppCompatActivity {
             getSupportActionBar().setTitle("Edit Order");
             editeActionOnCreate();
         }
-        String api = "https://www.app.acapy-trade.com/tokens.php";
-        final JasonReponser update = new JasonReponser();
-        update.setFinish(false);
-        update.execute(api);
-        final Handler handler = new Handler();
-        Runnable runnableCode = new Runnable() {
+        String api = getAPIHEADER(AddOrEditeOrderActivity.this) + "/tokens.php";
+        RequestQueue queue = Volley.newRequestQueue(this);
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, api,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        TokenList = response;
+                        Toast.makeText(AddOrEditeOrderActivity.this, "Ready", Toast.LENGTH_LONG).show();
+                    }
+                }, new Response.ErrorListener() {
             @Override
-            public void run() {
-                if (update.isFinish()) {
-                    TokenList = update.getUserId();
-                    Log.w(" ", TokenList);
+            public void onErrorResponse(VolleyError error) {
 
-                    Toast.makeText(AddOrEditeOrderActivity.this, "Ready", Toast.LENGTH_LONG).show();
-                } else {
-                    handler.postDelayed(this, 100);
-                }
+                Log.e("onResponse", error.toString());
             }
-        };
-        handler.post(runnableCode);
-//        pickedDate.setEnabled(false);
-//        pickedTime.setEnabled(false);
+        });
+        stringRequest.setShouldCache(false);
+        stringRequest.setShouldRetryConnectionErrors(true);
+        stringRequest.setShouldRetryServerErrors(true);
+        queue.add(stringRequest);
+
         final ImageView datePicker = (ImageView) findViewById(R.id.addorder_date_add);
         datePicker.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -180,25 +183,26 @@ public class AddOrEditeOrderActivity extends AppCompatActivity {
     }
 
     private void editeActionOnCreate() {
-        String api = "https://www.app.acapy-trade.com/orders.php?order=" + idUpdated;
-        final orderReponser update = new orderReponser();
-        update.setFinish(false);
-        update.execute(api);
-        final Handler handler = new Handler();
-        Runnable runnableCode = new Runnable() {
+        String api = getAPIHEADER(AddOrEditeOrderActivity.this) + "/orders.php?order=" + idUpdated;
+        RequestQueue queue = Volley.newRequestQueue(this);
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, api,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        String order =response;
+                        extractFeuterFromJason(order);
+                    }
+                }, new Response.ErrorListener() {
             @Override
-            public void run() {
-                if (update.isFinish()) {
-                    String order = update.getUserId();
-                    extractFeuterFromJason(order);
+            public void onErrorResponse(VolleyError error) {
 
-                } else {
-                    handler.postDelayed(this, 100);
-                }
+                Log.e("onResponse", error.toString());
             }
-        };
-        handler.post(runnableCode);
-
+        });
+        stringRequest.setShouldCache(false);
+        stringRequest.setShouldRetryConnectionErrors(true);
+        stringRequest.setShouldRetryServerErrors(true);
+        queue.add(stringRequest);
     }
 
     private void addActionOnCreate() {
@@ -231,7 +235,7 @@ public class AddOrEditeOrderActivity extends AppCompatActivity {
         spinnerArray.add("Ahmed");
         spinnerArray.add("Mohamed");
         spinnerArray.add("Remon");
-        spinnerArray.add("George");
+        spinnerArray.add("Barsom");
 
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(
                 this, android.R.layout.simple_spinner_item, spinnerArray);
@@ -258,9 +262,9 @@ public class AddOrEditeOrderActivity extends AppCompatActivity {
                         userName = "Remon";
                         OrderUserName = userId;
 
-                    } else if (selection.equals("George")) {
+                    } else if (selection.equals("Barsom")) {
                         userId = s[3];
-                        userName = "George";
+                        userName = "Barsom";
                         OrderUserName = userId;
                     }
                 }
@@ -287,127 +291,141 @@ public class AddOrEditeOrderActivity extends AppCompatActivity {
                 if (actionType.equals("add")) {
 
                     if (setUPVariables()) {
-                         setUpApi();
+                        setUpApi();
                         Log.w("addOrder", Api);
-                        final JasonReponser update = new JasonReponser();
-                        update.setFinish(false);
-                        update.execute(Api);
-                        final Handler handler = new Handler();
-                        Runnable runnableCode = new Runnable() {
-                            @Override
-                            public void run() {
-                                if (update.isFinish()) {
-                                    String res = update.getUserId();
-                                    if (!res.equals("0")) {
-                                        String prodApi = "https://www.app.acapy-trade.com/addProgress.php?order=" + res;
-                                        ArrayList<String> list = new ArrayList<>();
-                                        for (int i = 0; i < progList.getAdapter().getCount(); i++) {
-                                            String val = progList.getAdapter().getItem(i).toString();
-                                            list.add(val);
-                                            prodApi += "&prog[]=" + val;
-                                        }
-                                        final JasonReponser updateProgress = new JasonReponser();
-                                        updateProgress.setFinish(false);
-                                        updateProgress.execute(prodApi);
-                                        final Handler handlerProg = new Handler();
-                                        Runnable runnableCodeProg = new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                if (updateProgress.isFinish()) {
-                                                    String res = updateProgress.getUserId();
-                                                    if (!res.equals("0")) {
+                        RequestQueue queue = Volley.newRequestQueue(this);
+                        StringRequest stringRequest = new StringRequest(Request.Method.GET, Api,
+                                new Response.Listener<String>() {
+                                    @Override
+                                    public void onResponse(String response) {
+                                        String res = response;
+                                        if (!res.equals("0")) {
+                                            String prodApi = getAPIHEADER(AddOrEditeOrderActivity.this) +"/addProgress.php?order=" + res;
+                                            ArrayList<String> list = new ArrayList<>();
+                                            for (int i = 0; i < progList.getAdapter().getCount(); i++) {
+                                                String val = progList.getAdapter().getItem(i).toString();
+                                                list.add(val);
+                                                prodApi += "&prog[]=" + val;
+                                            }
+                                            RequestQueue queue = Volley.newRequestQueue(AddOrEditeOrderActivity.this);
+                                            StringRequest stringRequest = new StringRequest(Request.Method.GET, prodApi,
+                                                    new Response.Listener<String>() {
+                                                        @Override
+                                                        public void onResponse(String response) {
+                                                            String res = response;
+                                                            if (!res.equals("0")) {
 
-                                                        for (int i = 0; i < checkedColors.length; i++) {
-                                                            boolean checked = checkedColors[i];
-                                                            if (checked) {
-                                                                Data data = new Data("new order", "تم اضافة اوردر خاص بك", "order");
-                                                                SendNotification send = new SendNotification(AddOrEditeOrderActivity.this, getReciverName(usersList.get(i)), data);
+                                                                for (int i = 0; i < checkedColors.length; i++) {
+                                                                    boolean checked = checkedColors[i];
+                                                                    if (checked) {
+                                                                        Data data = new Data("new order", "تم اضافة اوردر خاص بك" + placeVal + " - " + locationVal, "order");
+                                                                        SendNotification send = new SendNotification(AddOrEditeOrderActivity.this, getReciverName(usersList.get(i)), data);
+                                                                    }
+                                                                }
+                                                                Toast.makeText(AddOrEditeOrderActivity.this, "Saved", Toast.LENGTH_LONG).show();
+                                                                startActivity(new Intent(AddOrEditeOrderActivity.this, MainActivity.class));
+                                                            } else {
+                                                                Toast.makeText(AddOrEditeOrderActivity.this, "not saved", Toast.LENGTH_LONG).show();
                                                             }
                                                         }
-                                                        Toast.makeText(AddOrEditeOrderActivity.this, "Saved", Toast.LENGTH_LONG).show();
-                                                        startActivity(new Intent(AddOrEditeOrderActivity.this, MainActivity.class));
-                                                    } else {
-                                                        Toast.makeText(AddOrEditeOrderActivity.this, "not saved", Toast.LENGTH_LONG).show();
-                                                    }
-                                                } else {
-                                                    handlerProg.postDelayed(this, 100);
-                                                }
-                                            }
-                                        };
-                                        handlerProg.post(runnableCodeProg);
+                                                    }, new Response.ErrorListener() {
+                                                @Override
+                                                public void onErrorResponse(VolleyError error) {
 
-                                    } else {
-                                        Toast.makeText(AddOrEditeOrderActivity.this, "not saved", Toast.LENGTH_LONG).show();
+                                                    Log.e("onResponse", error.toString());
+                                                }
+                                            });
+                                            stringRequest.setShouldCache(false);
+                                            stringRequest.setShouldRetryConnectionErrors(true);
+                                            stringRequest.setShouldRetryServerErrors(true);
+                                            queue.add(stringRequest);
+
+
+                                        } else {
+                                            Toast.makeText(AddOrEditeOrderActivity.this, "not saved", Toast.LENGTH_LONG).show();
+                                        }
                                     }
-                                } else {
-                                    handler.postDelayed(this, 100);
-                                }
+                                }, new Response.ErrorListener() {
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+
+                                Log.e("onResponse", error.toString());
                             }
-                        };
-                        handler.post(runnableCode);
+                        });
+                        stringRequest.setShouldCache(false);
+                        stringRequest.setShouldRetryConnectionErrors(true);
+                        stringRequest.setShouldRetryServerErrors(true);
+                        queue.add(stringRequest);
+
                     }
                 } else if (actionType.equals("update")) {
                     if (setUPVariables()) {
                         setUpApi();
                         Api += "&orderNum=" + idUpdated;
                         Log.w("addOrder", Api);
-                        final JasonReponser update = new JasonReponser();
-                        update.setFinish(false);
-                        update.execute(Api + "&orderNum=" + idUpdated);
-                        final Handler handler = new Handler();
-                        Runnable runnableCode = new Runnable() {
-                            @Override
-                            public void run() {
-                                if (update.isFinish()) {
-                                    String res = update.getUserId();
-                                    if (!res.equals("0")) {
-                                        String prodApi = "https://www.app.acapy-trade.com/addProgress.php?order=" + res;
-                                        ArrayList<String> list = new ArrayList<>();
-                                        for (int i = 0; i < progList.getAdapter().getCount(); i++) {
-                                            String val = progList.getAdapter().getItem(i).toString();
-                                            list.add(val);
-                                            prodApi += "&prog[]=" + val;
-                                        }
-                                        final JasonReponser updateProgress = new JasonReponser();
-                                        updateProgress.setFinish(false);
-                                        updateProgress.execute(prodApi);
-                                        final Handler handlerProg = new Handler();
-                                        Runnable runnableCodeProg = new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                if (updateProgress.isFinish()) {
-                                                    String res = updateProgress.getUserId();
-                                                    if (!res.equals("0")) {
-                                                        Toast.makeText(AddOrEditeOrderActivity.this, "Saved", Toast.LENGTH_LONG).show();
+                        RequestQueue queue = Volley.newRequestQueue(this);
+                        StringRequest stringRequest = new StringRequest(Request.Method.GET, Api + "&orderNum=" + idUpdated,
+                                new Response.Listener<String>() {
+                                    @Override
+                                    public void onResponse(String response) {
+                                        String res =response;
+                                        if (!res.equals("0")) {
+                                            String prodApi = getAPIHEADER(AddOrEditeOrderActivity.this) +"/addProgress.php?order=" + res;
+                                            ArrayList<String> list = new ArrayList<>();
+                                            for (int i = 0; i < progList.getAdapter().getCount(); i++) {
+                                                String val = progList.getAdapter().getItem(i).toString();
+                                                list.add(val);
+                                                prodApi += "&prog[]=" + val;
+                                            }
+                                            RequestQueue queue = Volley.newRequestQueue(AddOrEditeOrderActivity.this);
+                                            StringRequest stringRequest = new StringRequest(Request.Method.GET, prodApi,
+                                                    new Response.Listener<String>() {
+                                                        @Override
+                                                        public void onResponse(String response) {
+                                                            String res =response;
+                                                            if (!res.equals("0")) {
+                                                                Toast.makeText(AddOrEditeOrderActivity.this, "Saved", Toast.LENGTH_LONG).show();
 
-                                                        for (int i = 0; i < checkedColors.length; i++) {
-                                                            boolean checked = checkedColors[i];
-                                                            if (checked) {
-                                                                Data data = new Data("new order", "تم تعديل اوردر خاص بك", "order");
-                                                                SendNotification send = new SendNotification(AddOrEditeOrderActivity.this, getReciverName(usersList.get(i)), data);
+                                                                for (int i = 0; i < checkedColors.length; i++) {
+                                                                    boolean checked = checkedColors[i];
+                                                                    if (checked) {
+                                                                        Data data = new Data("new order", "تم تعديل اوردر خاص بك ("+placeVal + " - " + locationVal +"(", "order");
+                                                                        SendNotification send = new SendNotification(AddOrEditeOrderActivity.this, getReciverName(usersList.get(i)), data);
+                                                                    }
+                                                                }
+
+                                                                startActivity(new Intent(AddOrEditeOrderActivity.this, MainActivity.class));
+                                                            } else {
+                                                                Toast.makeText(AddOrEditeOrderActivity.this, "not saved", Toast.LENGTH_LONG).show();
                                                             }
                                                         }
+                                                    }, new Response.ErrorListener() {
+                                                @Override
+                                                public void onErrorResponse(VolleyError error) {
 
-                                                        startActivity(new Intent(AddOrEditeOrderActivity.this, MainActivity.class));
-                                                    } else {
-                                                        Toast.makeText(AddOrEditeOrderActivity.this, "not saved", Toast.LENGTH_LONG).show();
-                                                    }
-                                                } else {
-                                                    handlerProg.postDelayed(this, 100);
+                                                    Log.e("onResponse", error.toString());
                                                 }
-                                            }
-                                        };
-                                        handlerProg.post(runnableCodeProg);
-
-                                    } else {
-                                        Toast.makeText(AddOrEditeOrderActivity.this, "not saved", Toast.LENGTH_LONG).show();
+                                            });
+                                            stringRequest.setShouldCache(false);
+                                            stringRequest.setShouldRetryConnectionErrors(true);
+                                            stringRequest.setShouldRetryServerErrors(true);
+                                            queue.add(stringRequest);
+                                        } else {
+                                            Toast.makeText(AddOrEditeOrderActivity.this, "not saved", Toast.LENGTH_LONG).show();
+                                        }
                                     }
-                                } else {
-                                    handler.postDelayed(this, 100);
-                                }
+                                }, new Response.ErrorListener() {
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+
+                                Log.e("onResponse", error.toString());
                             }
-                        };
-                        handler.post(runnableCode);
+                        });
+                        stringRequest.setShouldCache(false);
+                        stringRequest.setShouldRetryConnectionErrors(true);
+                        stringRequest.setShouldRetryServerErrors(true);
+                        queue.add(stringRequest);
+
                     }
                 }
                 return true;
@@ -416,7 +434,7 @@ public class AddOrEditeOrderActivity extends AppCompatActivity {
     }
 
     private void setUpApi() {
-        Api = "https://www.app.acapy-trade.com/addOrdersNew.php?"
+        Api =getAPIHEADER(AddOrEditeOrderActivity.this)+ "/addOrdersNew.php?"
                 + "place=" + placeVal + "&location=" + locationVal
                 + "&date=" + dateVal + "&time=" + timeVal
                 + "&mater=" + matterVal + "&file=" + filesVal
@@ -477,7 +495,8 @@ public class AddOrEditeOrderActivity extends AppCompatActivity {
                         jsonArrayId.getString("num_of_matter"),
                         jsonArrayId.getString("dliverCost"),
                         jsonArrayId.getString("notes"),
-                        jsonArrayId.getString("files"), jsonArrayId.getString("username"),new ArrayList<boxes>()
+                        jsonArrayId.getString("files"),
+                        jsonArrayId.getString("username"), new ArrayList<boxes>()
                 );
                 place.setText(jsonArrayId.getString("place"));
                 location.setText(jsonArrayId.getString("location"));
@@ -498,44 +517,48 @@ public class AddOrEditeOrderActivity extends AppCompatActivity {
 
     private void extractProgressFromJason() {
 
-        String api = "https://www.app.acapy-trade.com/progress.php?order=" + idUpdated;
-        final progressReponser update = new progressReponser();
-        update.setFinish(false);
-        update.execute(api);
-        final Handler handler = new Handler();
-        Runnable runnableCode = new Runnable() {
+        String api =getAPIHEADER(AddOrEditeOrderActivity.this) + "/progress.php?order=" + idUpdated;
+        RequestQueue queue = Volley.newRequestQueue(this);
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, api,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        String order = response;
+                        Log.e("sa", order);
+                        final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(AddOrEditeOrderActivity.this, android.R.layout.simple_list_item_1, fetchBoxsJason(order));
+                        progList.setAdapter(arrayAdapter);
+                        addProg.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                arrayAdapter.add(addProgTex.getText().toString());
+                                addProgTex.setText("");
+                            }
+                        });
+                        progList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                            @Override
+                            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                                addProgTex.setText(arrayAdapter.getItem(i));
+                            }
+                        });
+                        removeProg.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                arrayAdapter.remove(addProgTex.getText().toString());
+                            }
+                        });
+                    }
+                }, new Response.ErrorListener() {
             @Override
-            public void run() {
-                if (update.isFinish()) {
-                    String order = update.getUserId();
-                    Log.e("sa", order);
-                    final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(AddOrEditeOrderActivity.this, android.R.layout.simple_list_item_1, fetchBoxsJason(order));
-                    progList.setAdapter(arrayAdapter);
-                    addProg.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            arrayAdapter.add(addProgTex.getText().toString());
-                            addProgTex.setText("");
-                        }
-                    });
-                    progList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                        @Override
-                        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                            addProgTex.setText(arrayAdapter.getItem(i));
-                        }
-                    });
-                    removeProg.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            arrayAdapter.remove(addProgTex.getText().toString());
-                        }
-                    });
-                } else {
-                    handler.postDelayed(this, 100);
-                }
+            public void onErrorResponse(VolleyError error) {
+
+                Log.e("onResponse", error.toString());
             }
-        };
-        handler.post(runnableCode);
+        });
+        stringRequest.setShouldCache(false);
+        stringRequest.setShouldRetryConnectionErrors(true);
+        stringRequest.setShouldRetryServerErrors(true);
+        queue.add(stringRequest);
+
     }
 
     private List<String> fetchBoxsJason(String boxesJasonResponse) {
@@ -561,8 +584,8 @@ public class AddOrEditeOrderActivity extends AppCompatActivity {
         switch (name) {
             case "Ahmed":
                 return "Ahmed Saleh";
-            case "George":
-                return "George Elgndy";
+            case "Barsom":
+                return "Barsom";
             case "Remon":
                 return "Remon";
             case "Mohamed":
@@ -579,7 +602,7 @@ public class AddOrEditeOrderActivity extends AppCompatActivity {
                 "Ahmed",
                 "Mohamed",
                 "Remon",
-                "George"
+                "Barsom"
         };
 
         checkedColors = new boolean[]{
@@ -649,8 +672,8 @@ public class AddOrEditeOrderActivity extends AppCompatActivity {
                 return "aRisjHAS36R5qrvXgAO8fpNIiLE3";
             case "Remon":
                 return "xHIE6dwSIwQB8rm3geTBzfJdN0r2";
-            case "George":
-                return "CREjud2a6YXajLzJJTtHqttthgp1";
+            case "Barsom":
+                return "poP0PGB5bpSoXYegmkTUOodDqjB2";
         }
         return "";
     }

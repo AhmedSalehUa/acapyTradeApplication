@@ -1,10 +1,10 @@
 package com.acpay.acapytrade.Navigations.Order;
 
+import static com.acpay.acapytrade.MainActivity.getAPIHEADER;
+
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,15 +19,18 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 
 import com.acpay.acapytrade.OrderOperations.Order;
-import com.acpay.acapytrade.OrderOperations.OrderDone;
 import com.acpay.acapytrade.OrderOperations.progress.boxes;
 import com.acpay.acapytrade.OrderOperations.progress.boxesAdapter;
-import com.acpay.acapytrade.OrderOperations.progress.progressReponser;
 import com.acpay.acapytrade.R;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -95,59 +98,61 @@ ImageView back;
     private void setBoxListDetails() {
         boxsAdapter.clear();
         boxesList.setEmptyView(boxesListEmpty);
-        String boxesapi = "https://www.app.acapy-trade.com/progress.php?order=" + order.getOrderNum();
+        String boxesapi =  getAPIHEADER(getContext()) + "/progress.php?order=" + order.getOrderNum();
+        RequestQueue queue = Volley.newRequestQueue(getContext());
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, boxesapi,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
 
-        final progressReponser boxesJason = new progressReponser();
-        boxesJason.setFinish(false);
-        boxesJason.execute(boxesapi);
-        final Handler boxeshandler = new Handler();
-        Runnable boxesrunnableCode = new Runnable() {
-            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-            @Override
-            public void run() {
-                if (boxesJason.isFinish()) {
+                        orderString =response;
+                        boxsAdapter.addAll(fetchBoxsJason(orderString));
+                        boxesProgressBar.setVisibility(View.GONE);
+                        boxesList.setAdapter(boxsAdapter);
+                        ListAdapter myListAdapter = boxesList.getAdapter();
+                        if (myListAdapter == null) {
 
-                    orderString = boxesJason.getUserId();
-                    boxsAdapter.addAll(fetchBoxsJason(orderString));
-                    boxesProgressBar.setVisibility(View.GONE);
-                    boxesList.setAdapter(boxsAdapter);
-                    ListAdapter myListAdapter = boxesList.getAdapter();
-                    if (myListAdapter == null) {
+                            return;
+                        }
 
-                        return;
-                    }
+                        int totalHeight = 0;
+                        for (int size = 0; size < myListAdapter.getCount(); size++) {
+                            View listItem = myListAdapter.getView(size, null, boxesList);
+                            listItem.measure(0, 0);
+                            totalHeight += listItem.getMeasuredHeight() + 85;
+                        }
 
-                    int totalHeight = 0;
-                    for (int size = 0; size < myListAdapter.getCount(); size++) {
-                        View listItem = myListAdapter.getView(size, null, boxesList);
-                        listItem.measure(0, 0);
-                        totalHeight += listItem.getMeasuredHeight() + 85;
-                    }
+                        ViewGroup.LayoutParams params = boxesList.getLayoutParams();
+                        params.height = totalHeight + (boxesList.getDividerHeight() * (myListAdapter.getCount() - 1));
+                        boxesList.setLayoutParams(params);
 
-                    ViewGroup.LayoutParams params = boxesList.getLayoutParams();
-                    params.height = totalHeight + (boxesList.getDividerHeight() * (myListAdapter.getCount() - 1));
-                    boxesList.setLayoutParams(params);
-
-                    for (int i = 0; i < boxsAdapter.getCount(); i++) {
-                        final int postion = i;
-                        boxsAdapter.getItem(i).setCheckListener(new CompoundButton.OnCheckedChangeListener() {
-                            @Override
-                            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                                boxes s = boxsAdapter.getItem(postion);
-                                if (compoundButton.isChecked()) {
-                                    list.add(s);
-                                } else {
-                                    list.remove(s);
+                        for (int i = 0; i < boxsAdapter.getCount(); i++) {
+                            final int postion = i;
+                            boxsAdapter.getItem(i).setCheckListener(new CompoundButton.OnCheckedChangeListener() {
+                                @Override
+                                public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                                    boxes s = boxsAdapter.getItem(postion);
+                                    if (compoundButton.isChecked()) {
+                                        list.add(s);
+                                    } else {
+                                        list.remove(s);
+                                    }
                                 }
-                            }
-                        });
+                            });
+                        }
                     }
-                } else {
-                    boxeshandler.postDelayed(this, 100);
-                }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+                Log.e("onResponse", error.toString());
             }
-        };
-        boxeshandler.post(boxesrunnableCode);
+        });
+        stringRequest.setShouldCache(false);
+        stringRequest.setShouldRetryConnectionErrors(true);
+        stringRequest.setShouldRetryServerErrors(true);
+        queue.add(stringRequest);
+
     }
 
     private void setDetails(View rootview) {
@@ -201,26 +206,31 @@ ImageView back;
                         .setCancelable(false)
                         .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                             public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                                String api =getAPIHEADER(getContext())+ "/enableOrder.php?order=" + order.getOrderNum();
 
-                                final OrderDone orderDone = new OrderDone(order, "enable");
-                                final Handler handler = new Handler();
-                                Runnable runnableCode = new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        if (orderDone.isFinish()) {
-                                            if (orderDone.getResponse().equals("1")) {
-                                                Toast.makeText(getContext(), "Active", Toast.LENGTH_SHORT).show();
-                                                onBackPressed();
-                                            } else {
-                                                Toast.makeText(getContext(), "Failed", Toast.LENGTH_SHORT).show();
+                                RequestQueue queue = Volley.newRequestQueue(getContext());
+                                StringRequest stringRequest = new StringRequest(Request.Method.GET, api,
+                                        new Response.Listener<String>() {
+                                            @Override
+                                            public void onResponse(String response) {
+                                                if (response.equals("1")) {
+                                                    Toast.makeText(getContext(), "Active", Toast.LENGTH_SHORT).show();
+                                                    onBackPressed();
+                                                } else {
+                                                    Toast.makeText(getContext(), "Failed", Toast.LENGTH_SHORT).show();
+                                                }
                                             }
-                                        } else {
-                                            handler.postDelayed(this, 100);
-                                        }
-                                    }
-                                };
-                                handler.post(runnableCode);
+                                        }, new Response.ErrorListener() {
+                                    @Override
+                                    public void onErrorResponse(VolleyError error) {
 
+                                        Log.e("onResponse", error.toString());
+                                    }
+                                });
+                                stringRequest.setShouldCache(false);
+                                stringRequest.setShouldRetryConnectionErrors(true);
+                                stringRequest.setShouldRetryServerErrors(true);
+                                queue.add(stringRequest);
                             }
                         })
                         .setNegativeButton("No", new DialogInterface.OnClickListener() {

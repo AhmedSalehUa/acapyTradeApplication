@@ -116,4 +116,6 @@
     <string name="deivcePassword">Password</string>
     <string name="deivceEmail">E-Mail</string>
     <string name="deivceEmailPassword">E-Mail Password</string>
+    <string name="lef_nav_static_ip">Static Ip</string>
+    <string name="lef_nav_sales">Sales</string>
 </resources>

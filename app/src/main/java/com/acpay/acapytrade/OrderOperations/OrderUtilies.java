@@ -29,17 +29,6 @@ public class OrderUtilies {
 
     }
 
-    public static List<Order> fetchData(String url) {
-        URL urlR = getUrl(url);
-        String jasonResponse = null;
-        try {
-            jasonResponse = getHttpRequest(urlR);
-        } catch (IOException e) {
-            Log.e(LOG_TAG, "Problem making the HTTP request.", e);
-        }
-        List<Order> books = extractFeuterFromJason(jasonResponse);
-        return books;
-    }
 
     public static List<Order> extractFeuterFromJason(String jason) {
         final List<Order> list = new ArrayList<>();

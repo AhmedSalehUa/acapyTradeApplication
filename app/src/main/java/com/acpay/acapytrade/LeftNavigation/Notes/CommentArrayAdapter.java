@@ -1,5 +1,7 @@
 package com.acpay.acapytrade.LeftNavigation.Notes;
 
+import static com.acpay.acapytrade.MainActivity.getAPIHEADER;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -24,6 +26,12 @@ import com.acpay.acapytrade.Navigations.Messages.Message;
 import com.acpay.acapytrade.Navigations.Messages.sendNotification.Data;
 import com.acpay.acapytrade.R;
 import com.acpay.acapytrade.SendNotification;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -103,28 +111,32 @@ public class CommentArrayAdapter extends ECCardContentListItemAdapter<NotesPlace
                             .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                                 public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
 
-                                    String api = "https://www.app.acapy-trade.com/deleteNotesDetails.php?id=" + objectItem.getId();
-                                    final NotesResponser update = new NotesResponser();
-                                    update.setFinish(false);
-                                    update.execute(api);
-                                    final Handler handler = new Handler();
-                                    Runnable runnableCode = new Runnable() {
-                                        @SuppressLint("NewApi")
-                                        @Override
-                                        public void run() {
-                                            if (update.isFinish()) {
-                                                if (update.getUserId().contains("1")) {
-                                                    Toast.makeText(getContext(), "Deleted", Toast.LENGTH_SHORT).show();
-                                                    a.startActivity(new Intent(a, MainActivity.class));
-                                                } else {
+                                    String api =  getAPIHEADER(getContext())+"/deleteNotesDetails.php?id=" + getItem(position).getId();
+
+
+                                    RequestQueue queue = Volley.newRequestQueue(getContext());
+                                    StringRequest stringRequest = new StringRequest(Request.Method.GET, api,
+                                            new Response.Listener<String>() {
+                                                @Override
+                                                public void onResponse(String response) {
+                                                    Log.e("response",response);
+                                                    if (response.contains("1")) {
+                                                        Toast.makeText(getContext(), "Deleted", Toast.LENGTH_SHORT).show();
+                                                        a.startActivity(new Intent(a, MainActivity.class));
+                                                    }
                                                 }
-                                            } else {
-                                                handler.postDelayed(this, 100);
-                                            }
+                                            }, new Response.ErrorListener() {
+                                        @Override
+                                        public void onErrorResponse(VolleyError error) {
+
+                                            Log.e("onResponse", error.toString());
                                         }
-                                    };
-                                    handler.postDelayed(runnableCode, 1000);
-                                    handler.post(runnableCode);
+                                    });
+                                    stringRequest.setShouldCache(false);
+                                    stringRequest.setShouldRetryConnectionErrors(true);
+                                    stringRequest.setShouldRetryServerErrors(true);
+                                    queue.add(stringRequest);
+
                                 }
                             })
                             .setNegativeButton("No", new DialogInterface.OnClickListener() {

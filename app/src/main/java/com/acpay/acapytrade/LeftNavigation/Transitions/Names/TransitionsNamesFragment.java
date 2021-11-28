@@ -41,7 +41,7 @@ public class TransitionsNamesFragment extends Fragment {
         ListView listView = (ListView)rootview.findViewById(R.id.nameCostList);
         List<TransitionsName> list = new ArrayList<>();
         list.add(new TransitionsName("Ahmed"));
-        list.add(new TransitionsName("George"));
+        list.add(new TransitionsName("Barsom"));
         list.add(new TransitionsName("Remon"));
         list.add(new TransitionsName("Mohamed"));
 

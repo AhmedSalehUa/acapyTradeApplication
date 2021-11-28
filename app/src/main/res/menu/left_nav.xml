@@ -22,6 +22,14 @@
                     android:id="@+id/lef_nav_notes"
                     android:icon="@drawable/ic_baseline_note_add_24"
                     android:title="@string/lef_nav_notes" />
+                <item
+                    android:id="@+id/lef_nav_static_ip"
+                    android:icon="@drawable/ic_action_name"
+                    android:title="@string/lef_nav_static_ip" />
+                <item
+                    android:id="@+id/lef_nav_sales"
+                    android:icon="@drawable/ic_sales"
+                    android:title="@string/lef_nav_sales" />
             </group>
         </menu>
     </item>

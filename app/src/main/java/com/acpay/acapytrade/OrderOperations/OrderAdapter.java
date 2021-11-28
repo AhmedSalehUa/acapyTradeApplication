@@ -14,10 +14,6 @@ import com.acpay.acapytrade.R;
 
 import java.util.List;
 
-/**
- * Simple example of ListAdapter for using with Folding Cell
- * Adapter holds indexes of unfolded elements for correct work with default reusable views behavior
- */
 @SuppressWarnings({"WeakerAccess", "unused"})
 public class OrderAdapter extends ArrayAdapter<Order> {
     TextView orderNum;

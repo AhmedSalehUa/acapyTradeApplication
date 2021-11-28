@@ -1,13 +1,15 @@
 package com.acpay.acapytrade.LeftNavigation.Transitions.Pay;
 
+import static com.acpay.acapytrade.MainActivity.getAPIHEADER;
+
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -22,9 +24,14 @@ import androidx.fragment.app.Fragment;
 import com.acpay.acapytrade.LeftNavigation.Transitions.Names.TransitionsNamesFragment;
 import com.acpay.acapytrade.LeftNavigation.Transitions.Transitions;
 import com.acpay.acapytrade.Navigations.Messages.sendNotification.Data;
-import com.acpay.acapytrade.Navigations.Messages.sendNotification.Token;
 import com.acpay.acapytrade.R;
 import com.acpay.acapytrade.SendNotification;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import org.json.JSONArray;
@@ -45,10 +52,11 @@ public class TransitionsDetailsFragment extends Fragment {
     }
 
     TransitionDetailsAdapter adapter;
-    TransitionsApiUpdate updatea;
-    TransitionsApiRespoding update;
+
     ProgressBar progressBar;
     TextView emptyList;
+    TextView totalText;
+    Button payAll;
 
     @Nullable
     @Override
@@ -56,61 +64,72 @@ public class TransitionsDetailsFragment extends Fragment {
         View rootview = inflater.inflate(R.layout.activity_transitions_details, container, false);
         final ListView listView = rootview.findViewById(R.id.costList);
         progressBar = rootview.findViewById(R.id.costListProgress);
+        totalText = rootview.findViewById(R.id.total);
+        payAll = rootview.findViewById(R.id.payAll);
         emptyList = rootview.findViewById(R.id.costListText);
         emptyList.setText("جارى التحميل");
-        String api = "https://www.app.acapy-trade.com/getTransitions.php?name=" + name + "&status=false";
-        update = new TransitionsApiRespoding();
-        update.setFinish(false);
-        update.execute(api);
-        final Handler handler = new Handler();
-        Runnable runnableCode = new Runnable() {
-            @Override
-            public void run() {
-                if (update.isFinish()) {
-                    List<TransitionsDetails> list = extractTransitionsfromapi(update.getUserId());
-                    adapter = new TransitionDetailsAdapter(getContext(), list, "details");
-                    listView.setAdapter(adapter);
-                    listView.setEmptyView(emptyList);
-                    progressBar.setVisibility(View.GONE);
-                    emptyList.setText("لايوجد انتقالات");
-                    for (int x = 0; x < adapter.getCount(); x++) {
-                        final TransitionsDetails transitionsDetails = adapter.getItem(x);
-                        transitionsDetails.setPayBtnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                String api = "https://www.app.acapy-trade.com/updateTransitions.php?id=" + transitionsDetails.getOrderNum() + "&status=true";
-                                updatea = new TransitionsApiUpdate();
-                                updatea.setFinish(false);
-                                updatea.execute(api);
-                                final Handler handler = new Handler();
-                                Runnable runnableCode = new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        if (updatea.isFinish()) {
-                                            Toast.makeText(getContext(), "done", Toast.LENGTH_SHORT).show();
-                                            getFragmentManager().beginTransaction().replace(R.id.transition_container, new TransitionsDetailsFragment(bottomNav, name)).commit();
-                                            Data data = new Data( "تنقلات", "تم تحويل تنقلات " + transitionsDetails.getPlace() + " " + transitionsDetails.getLocation(),"costs");
-                                            SendNotification send = new SendNotification(getContext(), getReciverName(name),data);
-                                        } else {
-                                            handler.postDelayed(this, 100);
-                                        }
-                                    }
+        String api = getAPIHEADER(getContext()) + "/getTransitions.php?name=" + name + "&status=false";
+        RequestQueue queue = Volley.newRequestQueue(getContext());
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, api,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        List<TransitionsDetails> list = extractTransitionsfromapi(response);
+                        adapter = new TransitionDetailsAdapter(getContext(), list, "details");
+                        listView.setAdapter(adapter);
+                        listView.setEmptyView(emptyList);
+                        progressBar.setVisibility(View.GONE);
+                        emptyList.setText("لايوجد انتقالات");
+                        double total = 0;
+                        for (int x = 0; x < adapter.getCount(); x++) {
+                            final TransitionsDetails transitionsDetails = adapter.getItem(x);
 
-
-                                };
-                                handler.post(runnableCode);
+                            for (int y = 0; y < transitionsDetails.getList().size(); y++) {
+                                total += Double.parseDouble(transitionsDetails.getList().get(y).getAmount());
                             }
-                        });
+
+                            transitionsDetails.setPayBtnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    String api = getAPIHEADER(getContext()) + "/updateTransitions.php?id=" + transitionsDetails.getOrderNum() + "&status=true";
+                                    RequestQueue queue = Volley.newRequestQueue(getContext());
+                                    StringRequest stringRequest = new StringRequest(Request.Method.GET, api,
+                                            new Response.Listener<String>() {
+                                                @Override
+                                                public void onResponse(String response) {
+                                                    Toast.makeText(getContext(), "done", Toast.LENGTH_SHORT).show();
+                                                    getFragmentManager().beginTransaction().replace(R.id.transition_container, new TransitionsDetailsFragment(bottomNav, name)).commit();
+                                                    Data data = new Data("تنقلات", "تم تحويل تنقلات " + transitionsDetails.getPlace() + " " + transitionsDetails.getLocation(), "costs");
+                                                    SendNotification send = new SendNotification(getContext(), getReciverName(name), data);
+                                                }
+                                            }, new Response.ErrorListener() {
+                                        @Override
+                                        public void onErrorResponse(VolleyError error) {
+
+                                            Log.e("onResponse", error.toString());
+                                        }
+                                    });
+                                    stringRequest.setShouldCache(false);
+                                    stringRequest.setShouldRetryConnectionErrors(true);
+                                    stringRequest.setShouldRetryServerErrors(true);
+                                    queue.add(stringRequest);
+
+                                }
+                            });
+                        }
+                        totalText.setText(String.valueOf(total));
                     }
-                    Log.e("as", list.toString());
-                } else {
-                    handler.postDelayed(this, 100);
-                }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+                Log.e("onResponse", error.toString());
             }
-
-
-        };
-        handler.post(runnableCode);
+        });
+        stringRequest.setShouldCache(false);
+        stringRequest.setShouldRetryConnectionErrors(true);
+        stringRequest.setShouldRetryServerErrors(true);
+        queue.add(stringRequest);
         setHasOptionsMenu(true);
         OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
             @Override
@@ -119,6 +138,41 @@ public class TransitionsDetailsFragment extends Fragment {
                 bottomNav.setSelectedItemId(R.id.nav_transitions_names);
             }
         };
+        payAll.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (adapter.getCount() == 0) {
+                    Log.e("adapter.getCount()", String.valueOf(adapter.getCount()));
+                } else {
+                    RequestQueue queue = Volley.newRequestQueue(getContext());
+                    for (int x = 0; x < adapter.getCount(); x++) {
+                        final TransitionsDetails transitionsDetails = adapter.getItem(x);
+                        String api = getAPIHEADER(getContext()) + "/updateTransitions.php?id=" + transitionsDetails.getOrderNum() + "&status=true";
+                        StringRequest stringRequest = new StringRequest(Request.Method.GET, api,
+                                new Response.Listener<String>() {
+                                    @Override
+                                    public void onResponse(String response) {
+                                        Log.e("response", response);
+//                                        Toast.makeText(getContext(), "done", Toast.LENGTH_SHORT).show();
+                                        Data data = new Data("تنقلات", "تم تحويل تنقلات " + transitionsDetails.getPlace() + " " + transitionsDetails.getLocation(), "costs");
+                                        SendNotification send = new SendNotification(getContext(), getReciverName(name), data);
+                                    }
+                                }, new Response.ErrorListener() {
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+                                Log.e("onResponse", error.toString());
+                            }
+                        });
+                        stringRequest.setShouldCache(false);
+                        stringRequest.setShouldRetryConnectionErrors(true);
+                        stringRequest.setShouldRetryServerErrors(true);
+                        queue.add(stringRequest);
+                    }
+                    getFragmentManager().beginTransaction().replace(R.id.transition_container, new TransitionsDetailsFragment(bottomNav, name)).commit();
+                }
+
+            }
+        });
         requireActivity().getOnBackPressedDispatcher().addCallback(this, callback);
         ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("انتقالات");
         return rootview;

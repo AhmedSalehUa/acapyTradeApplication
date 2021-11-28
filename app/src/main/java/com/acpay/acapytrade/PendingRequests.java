@@ -11,12 +11,6 @@ import com.acpay.acapytrade.Navigations.Order.OrderPended;
 import com.acpay.acapytrade.OrderOperations.OrderAdapter;
 
 public class PendingRequests extends AppCompatActivity {
-    private String ApiUrl = " https://www.app.acapy-trade.com/orders.php?type=pen";
-
-    OrderAdapter adapter;
-    TextView State;
-    ProgressBar Loding;
-
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

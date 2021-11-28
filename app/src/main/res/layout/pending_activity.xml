@@ -1,15 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/RequestpullToRefresh"
     android:layout_width="match_parent"
+    android:id="@+id/pending_container"
     android:layout_height="match_parent">
-
-
-    <FrameLayout
-        android:id="@+id/pending_container"
-        android:layout_width="match_parent"
-        android:layout_marginBottom="60dp"
-        android:layout_height="match_parent">
-    </FrameLayout>
-</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+</FrameLayout>

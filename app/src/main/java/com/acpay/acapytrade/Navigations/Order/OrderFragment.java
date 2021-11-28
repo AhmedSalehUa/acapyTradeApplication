@@ -1,15 +1,18 @@
 package com.acpay.acapytrade.Navigations.Order;
 
+import static com.acpay.acapytrade.MainActivity.getAPIHEADER;
+
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.opengl.Visibility;
 import android.os.Bundle;
-import android.os.Handler;
 import android.text.InputType;
+import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -31,32 +34,32 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.loader.app.LoaderManager;
-import androidx.loader.content.Loader;
 
 import com.acpay.acapytrade.AddOrEditeOrderActivity;
 import com.acpay.acapytrade.DeletedActivity;
 import com.acpay.acapytrade.FinishedActivity;
-import com.acpay.acapytrade.OrderOperations.OrderAdapter;
-import com.acpay.acapytrade.OrderOperations.OrderDone;
 import com.acpay.acapytrade.OrderOperations.OrderFoldingCellAdapter;
+import com.acpay.acapytrade.OrderOperations.OrderUtilies;
 import com.acpay.acapytrade.PendingRequests;
 import com.acpay.acapytrade.R;
 import com.acpay.acapytrade.OrderOperations.Order;
-import com.acpay.acapytrade.OrderOperations.OrderLoader;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.ramotion.foldingcell.FoldingCell;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class OrderFragment extends Fragment implements LoaderManager.LoaderCallbacks<List<Order>> {
+public class OrderFragment extends Fragment {
     String uid;
-    private String ApiUrl = "https://www.app.acapy-trade.com/orders.php?type=ok";
+    private String ApiUrl = "";
     ListView theListView;
     OrderFoldingCellAdapter adapter;
-    LoaderManager loaderManager;
-    private static final int ORDER_LOADER_ID = 1;
 
     ProgressBar progressBar;
     TextView emptyList;
@@ -83,6 +86,8 @@ public class OrderFragment extends Fragment implements LoaderManager.LoaderCallb
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.orders_activity, container, false);
+ApiUrl=getAPIHEADER(getContext()) + "/orders.php?type=ok";
+
         final SwipeRefreshLayout pullToRefresh = rootView.findViewById(R.id.pullToRefresh);
         progressBar = rootView.findViewById(R.id.listProgressOrder);
 
@@ -100,8 +105,7 @@ public class OrderFragment extends Fragment implements LoaderManager.LoaderCallb
                 boolean isConnected = activeNetwork != null &&
                         activeNetwork.isConnectedOrConnecting();
                 if (isConnected) {
-                    loaderManager = getLoaderManager();
-                    loaderManager.initLoader(ORDER_LOADER_ID, null, OrderFragment.this);
+                    performApi();
                 } else {
                     emptyList.setText("لا يوجد اتصال بالانترنت");
                 }
@@ -126,8 +130,7 @@ public class OrderFragment extends Fragment implements LoaderManager.LoaderCallb
             }
 
             @Override
-            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount)
-            {
+            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
                 int topRowVerticalPosition = (theListView == null || theListView.getChildCount() == 0) ? 0 : theListView.getChildAt(0).getTop();
                 pullToRefresh.setEnabled(firstVisibleItem == 0 && topRowVerticalPosition >= 0);
 
@@ -141,8 +144,7 @@ public class OrderFragment extends Fragment implements LoaderManager.LoaderCallb
         boolean isConnected = activeNetwork != null &&
                 activeNetwork.isConnectedOrConnecting();
         if (isConnected) {
-            loaderManager = getLoaderManager();
-            loaderManager.initLoader(ORDER_LOADER_ID, null, OrderFragment.this);
+            performApi();
         } else {
             emptyList.setText("لا يوجد اتصال بالانترنت");
         }
@@ -166,15 +168,32 @@ public class OrderFragment extends Fragment implements LoaderManager.LoaderCallb
         return rootView;
     }
 
+    private void performApi() {
 
-    @NonNull
-    @Override
-    public Loader onCreateLoader(int id, @Nullable Bundle args) {
-        return new OrderLoader(getContext(), ApiUrl);
+        RequestQueue queue = Volley.newRequestQueue(getContext());
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, ApiUrl,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.e("onResponse", response);
+                        List<Order> orders = OrderUtilies.extractFeuterFromJason(response);
+                        setupAdpater(orders);
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+                Log.e("onResponse", error.toString());
+            }
+        });
+        stringRequest.setShouldCache(false);
+        stringRequest.setShouldRetryConnectionErrors(true);
+        stringRequest.setShouldRetryServerErrors(true);
+        queue.add(stringRequest);
     }
 
-    @Override
-    public void onLoadFinished(@NonNull Loader<List<Order>> loader, List<Order> data) {
+
+    public void setupAdpater(List<Order> data) {
         progressBar.setVisibility(View.GONE);
         emptyList.setText("لا يوجد اوردرات");
         adapter.clear();
@@ -212,24 +231,31 @@ public class OrderFragment extends Fragment implements LoaderManager.LoaderCallb
                         alertDialog.setView(container);
                         alertDialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
-                                final OrderDone orderDone = new OrderDone(adapter.getItem(postion), "updateNotes", input.getText().toString());
-                                final Handler handler = new Handler();
-                                Runnable runnableCode = new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        if (orderDone.isFinish()) {
-                                            if (orderDone.getResponse().equals("1")) {
-                                                Toast.makeText(getContext(), "Updated", Toast.LENGTH_SHORT).show();
-                                                onBackPressed();
-                                            } else {
-                                                Toast.makeText(getContext(), "Failed", Toast.LENGTH_SHORT).show();
+                                String api = getAPIHEADER(getContext()) + "/updatenotes.php?order=" + adapter.getItem(postion).getOrderNum() + "&note=" + input.getText().toString();
+
+                                RequestQueue queue = Volley.newRequestQueue(getContext());
+                                StringRequest stringRequest = new StringRequest(Request.Method.GET, api,
+                                        new Response.Listener<String>() {
+                                            @Override
+                                            public void onResponse(String response) {
+                                                if (response.equals("1")) {
+                                                    Toast.makeText(getContext(), "Updated", Toast.LENGTH_SHORT).show();
+                                                    onBackPressed();
+                                                } else {
+                                                    Toast.makeText(getContext(), "Failed", Toast.LENGTH_SHORT).show();
+                                                }
                                             }
-                                        } else {
-                                            handler.postDelayed(this, 100);
-                                        }
+                                        }, new Response.ErrorListener() {
+                                    @Override
+                                    public void onErrorResponse(VolleyError error) {
+
+                                        Log.e("onResponse", error.toString());
                                     }
-                                };
-                                handler.post(runnableCode);
+                                });
+                                stringRequest.setShouldCache(false);
+                                stringRequest.setShouldRetryConnectionErrors(true);
+                                stringRequest.setShouldRetryServerErrors(true);
+                                queue.add(stringRequest);
                             }
                         }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
@@ -242,7 +268,7 @@ public class OrderFragment extends Fragment implements LoaderManager.LoaderCallb
                     @Override
                     public void onClick(View view) {
                         Intent intent = new Intent(getContext(), AddOrEditeOrderActivity.class);
-                        intent.putExtra("id",adapter.getItem(postion).getOrderNum());
+                        intent.putExtra("id", adapter.getItem(postion).getOrderNum());
                         startActivity(intent);
                     }
                 });
@@ -255,26 +281,31 @@ public class OrderFragment extends Fragment implements LoaderManager.LoaderCallb
                                 .setCancelable(false)
                                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                                     public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                                        String api = getAPIHEADER(getContext()) + "/pendingOrder.php?order=" + adapter.getItem(postion).getOrderNum();
 
-                                        final OrderDone orderDone = new OrderDone(adapter.getItem(postion), "pending");
-                                        final Handler handler = new Handler();
-                                        Runnable runnableCode = new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                if (orderDone.isFinish()) {
-                                                    if (orderDone.getResponse().equals("1")) {
-                                                        Toast.makeText(getContext(), "Saved", Toast.LENGTH_SHORT).show();
-                                                        onBackPressed();
-                                                    } else {
-                                                        Toast.makeText(getContext(), "Failed", Toast.LENGTH_SHORT).show();
+                                        RequestQueue queue = Volley.newRequestQueue(getContext());
+                                        StringRequest stringRequest = new StringRequest(Request.Method.GET, api,
+                                                new Response.Listener<String>() {
+                                                    @Override
+                                                    public void onResponse(String response) {
+                                                        if (response.equals("1")) {
+                                                            Toast.makeText(getContext(), "Saved", Toast.LENGTH_SHORT).show();
+                                                            onBackPressed();
+                                                        } else {
+                                                            Toast.makeText(getContext(), "Failed", Toast.LENGTH_SHORT).show();
+                                                        }
                                                     }
-                                                } else {
-                                                    handler.postDelayed(this, 100);
-                                                }
-                                            }
-                                        };
-                                        handler.post(runnableCode);
+                                                }, new Response.ErrorListener() {
+                                            @Override
+                                            public void onErrorResponse(VolleyError error) {
 
+                                                Log.e("onResponse", error.toString());
+                                            }
+                                        });
+                                        stringRequest.setShouldCache(false);
+                                        stringRequest.setShouldRetryConnectionErrors(true);
+                                        stringRequest.setShouldRetryServerErrors(true);
+                                        queue.add(stringRequest);
                                     }
                                 })
                                 .setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -294,25 +325,32 @@ public class OrderFragment extends Fragment implements LoaderManager.LoaderCallb
                                 .setCancelable(false)
                                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                                     public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                                        String api = getAPIHEADER(getContext()) + "/deleteOrder.php?order=" + adapter.getItem(postion).getOrderNum();
 
-                                        final OrderDone orderDone = new OrderDone(adapter.getItem(postion), "delete");
-                                        final Handler handler = new Handler();
-                                        Runnable runnableCode = new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                if (orderDone.isFinish()) {
-                                                    if (orderDone.getResponse().equals("1")) {
-                                                        Toast.makeText(getContext(), "Saved", Toast.LENGTH_SHORT).show();
-                                                        onBackPressed();
-                                                    } else {
-                                                        Toast.makeText(getContext(), "Failed", Toast.LENGTH_SHORT).show();
+                                        RequestQueue queue = Volley.newRequestQueue(getContext());
+                                        StringRequest stringRequest = new StringRequest(Request.Method.GET, api,
+                                                new Response.Listener<String>() {
+                                                    @Override
+                                                    public void onResponse(String response) {
+                                                        if (response.equals("1")) {
+                                                            Toast.makeText(getContext(), "Saved", Toast.LENGTH_SHORT).show();
+                                                            onBackPressed();
+                                                        } else {
+                                                            Toast.makeText(getContext(), "Failed", Toast.LENGTH_SHORT).show();
+                                                        }
                                                     }
-                                                } else {
-                                                    handler.postDelayed(this, 100);
-                                                }
+                                                }, new Response.ErrorListener() {
+                                            @Override
+                                            public void onErrorResponse(VolleyError error) {
+
+                                                Log.e("onResponse", error.toString());
                                             }
-                                        };
-                                        handler.post(runnableCode);
+                                        });
+                                        stringRequest.setShouldCache(false);
+                                        stringRequest.setShouldRetryConnectionErrors(true);
+                                        stringRequest.setShouldRetryServerErrors(true);
+                                        queue.add(stringRequest);
+
 
                                     }
                                 })
@@ -338,18 +376,15 @@ public class OrderFragment extends Fragment implements LoaderManager.LoaderCallb
     }
 
     @Override
-    public void onLoaderReset(@NonNull Loader loader) {
-        adapter.clear();
-    }
-
-    @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.menu_catalog, menu);
 
     }
+
     private void onBackPressed() {
         getFragmentManager().beginTransaction().replace(R.id.fragment_container, new OrderFragment()).commit();
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
@@ -367,6 +402,37 @@ public class OrderFragment extends Fragment implements LoaderManager.LoaderCallb
             case R.id.done_orders:
                 Intent intent3 = new Intent(getContext(), FinishedActivity.class);
                 startActivity(intent3);
+                return true;
+
+            case R.id.setStaticIp:
+                AlertDialog.Builder alertDialog = new AlertDialog.Builder(getContext());
+                alertDialog.setTitle("set Static Ip");
+                LinearLayout container = new LinearLayout(getContext());
+                container.setOrientation(LinearLayout.VERTICAL);
+                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                lp.setMargins(20, 20, 20, 20);
+                final EditText input = new EditText(getContext());
+                input.setLayoutParams(lp);
+                input.setGravity(Gravity.TOP | Gravity.LEFT);
+                input.setInputType(InputType.TYPE_CLASS_TEXT);
+                input.setLines(1);
+                input.setMaxLines(1);
+                input.setText(getAPIHEADER(getContext()));
+                container.addView(input, lp);
+                alertDialog.setView(container);
+                alertDialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        if (input.getText().toString().length() > 1) {
+                            SharedPreferences.Editor sharedPreferences = getContext().getSharedPreferences("MainActivity", 0).edit();
+                            sharedPreferences.putString("api", input.getText().toString());
+                            sharedPreferences.commit();
+                        }
+                    }
+                }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        Toast.makeText(getContext(), "canceled", Toast.LENGTH_SHORT).show();
+                    }
+                }).show();
                 return true;
 
         }

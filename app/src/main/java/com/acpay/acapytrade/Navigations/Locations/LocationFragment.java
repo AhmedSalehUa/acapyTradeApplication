@@ -1,14 +1,9 @@
 package com.acpay.acapytrade.Navigations.Locations;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
-import androidx.loader.app.LoaderManager;
-import androidx.loader.content.Loader;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import static com.acpay.acapytrade.MainActivity.getAPIHEADER;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -18,7 +13,19 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+
 import com.acpay.acapytrade.R;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -29,15 +36,12 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LocationFragment extends Fragment implements LoaderManager.LoaderCallbacks<List<location>> {
+public class LocationFragment extends Fragment {
     GoogleMap goMap;
-    private String ApiUrl = "https://www.app.acapy-trade.com/locations.php";
+    private String ApiUrl ="";
 
     locationAdapter adapter;
-    LoaderManager loaderManager;
-    private static final int LOCATION_LOADER_ID = 1;
     private OnMapReadyCallback callback = new OnMapReadyCallback() {
-
         @Override
         public void onMapReady(GoogleMap googleMap) {
             goMap = googleMap;
@@ -60,12 +64,13 @@ public class LocationFragment extends Fragment implements LoaderManager.LoaderCa
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.location_activity, container, false);
+        ApiUrl = getAPIHEADER(getContext())+"/locations.php";
+
         final SwipeRefreshLayout pullToRefresh = rootView.findViewById(R.id.location_list_swap);
         pullToRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                loaderManager.restartLoader(LOCATION_LOADER_ID, null, LocationFragment.this);
-                loaderManager.initLoader(LOCATION_LOADER_ID, null, LocationFragment.this);
+               performApi();
                 pullToRefresh.setRefreshing(false);
                 Toast.makeText(getContext(), "Updated", Toast.LENGTH_SHORT).show();
             }
@@ -85,14 +90,36 @@ public class LocationFragment extends Fragment implements LoaderManager.LoaderCa
             }
         });
 
-        loaderManager = getLoaderManager();
-        loaderManager.initLoader(LOCATION_LOADER_ID, null, LocationFragment.this);
+        performApi();
 
         adapter = new locationAdapter(getContext(), new ArrayList<location>());
         theListView.setAdapter(adapter);
         ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Location");
         setHasOptionsMenu(true);
         return rootView;
+    }
+
+    private void performApi() {
+        RequestQueue queue = Volley.newRequestQueue(getContext());
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, ApiUrl,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.e("onResponse", response);
+                        List<location> orders = locationUtilies.extractFeuterFromJason(response);
+                        setupAdpater(orders);
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+                Log.e("onResponse", error.toString());
+            }
+        });
+        stringRequest.setShouldCache(false);
+        stringRequest.setShouldRetryConnectionErrors(true);
+        stringRequest.setShouldRetryServerErrors(true);
+        queue.add(stringRequest);
     }
 
     @Override
@@ -111,14 +138,7 @@ public class LocationFragment extends Fragment implements LoaderManager.LoaderCa
         }
     }
 
-    @NonNull
-    @Override
-    public Loader<List<location>> onCreateLoader(int id, @Nullable Bundle args) {
-        return new locationLoader(getContext(), ApiUrl);
-    }
-
-    @Override
-    public void onLoadFinished(@NonNull Loader<List<location>> loader, List<location> data) {
+    public void setupAdpater( List<location> data) {
         adapter.clear();
         if (data != null && !data.isEmpty()) {
             adapter.addAll(data);
@@ -126,8 +146,4 @@ public class LocationFragment extends Fragment implements LoaderManager.LoaderCa
         }
     }
 
-    @Override
-    public void onLoaderReset(@NonNull Loader<List<location>> loader) {
-        adapter.clear();
-    }
 }
