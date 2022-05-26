@@ -28,6 +28,7 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.acpay.acapytrade.DatabaseHelper.DatabaseHandler;
 import com.acpay.acapytrade.Navigations.Messages.sendNotification.APIService;
 import com.acpay.acapytrade.Navigations.Messages.sendNotification.Client;
 import com.acpay.acapytrade.Navigations.Messages.sendNotification.Data;
@@ -82,10 +83,14 @@ public class AddOrEditeOrderActivity extends AppCompatActivity {
     APIService apiService;
     Token token;
 
+    DatabaseHandler db;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.addorder_activity);
+        db = new DatabaseHandler(this);
+
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
         apiService = Client.getClient("https://fcm.googleapis.com/").create(APIService.class);
         Intent data = getIntent();
@@ -189,7 +194,7 @@ public class AddOrEditeOrderActivity extends AppCompatActivity {
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        String order =response;
+                        String order = response;
                         extractFeuterFromJason(order);
                     }
                 }, new Response.ErrorListener() {
@@ -300,7 +305,7 @@ public class AddOrEditeOrderActivity extends AppCompatActivity {
                                     public void onResponse(String response) {
                                         String res = response;
                                         if (!res.equals("0")) {
-                                            String prodApi = getAPIHEADER(AddOrEditeOrderActivity.this) +"/addProgress.php?order=" + res;
+                                            String prodApi = getAPIHEADER(AddOrEditeOrderActivity.this) + "/addProgress.php?order=" + res;
                                             ArrayList<String> list = new ArrayList<>();
                                             for (int i = 0; i < progList.getAdapter().getCount(); i++) {
                                                 String val = progList.getAdapter().getItem(i).toString();
@@ -319,7 +324,7 @@ public class AddOrEditeOrderActivity extends AppCompatActivity {
                                                                     boolean checked = checkedColors[i];
                                                                     if (checked) {
                                                                         Data data = new Data("new order", "تم اضافة اوردر خاص بك" + placeVal + " - " + locationVal, "order");
-                                                                        SendNotification send = new SendNotification(AddOrEditeOrderActivity.this, getReciverName(usersList.get(i)), data);
+                                                                        SendNotification send = new SendNotification(AddOrEditeOrderActivity.this,  usersList.get(i) , data);
                                                                     }
                                                                 }
                                                                 Toast.makeText(AddOrEditeOrderActivity.this, "Saved", Toast.LENGTH_LONG).show();
@@ -368,9 +373,9 @@ public class AddOrEditeOrderActivity extends AppCompatActivity {
                                 new Response.Listener<String>() {
                                     @Override
                                     public void onResponse(String response) {
-                                        String res =response;
+                                        String res = response;
                                         if (!res.equals("0")) {
-                                            String prodApi = getAPIHEADER(AddOrEditeOrderActivity.this) +"/addProgress.php?order=" + res;
+                                            String prodApi = getAPIHEADER(AddOrEditeOrderActivity.this) + "/addProgress.php?order=" + res;
                                             ArrayList<String> list = new ArrayList<>();
                                             for (int i = 0; i < progList.getAdapter().getCount(); i++) {
                                                 String val = progList.getAdapter().getItem(i).toString();
@@ -382,15 +387,15 @@ public class AddOrEditeOrderActivity extends AppCompatActivity {
                                                     new Response.Listener<String>() {
                                                         @Override
                                                         public void onResponse(String response) {
-                                                            String res =response;
+                                                            String res = response;
                                                             if (!res.equals("0")) {
                                                                 Toast.makeText(AddOrEditeOrderActivity.this, "Saved", Toast.LENGTH_LONG).show();
 
                                                                 for (int i = 0; i < checkedColors.length; i++) {
                                                                     boolean checked = checkedColors[i];
                                                                     if (checked) {
-                                                                        Data data = new Data("new order", "تم تعديل اوردر خاص بك ("+placeVal + " - " + locationVal +"(", "order");
-                                                                        SendNotification send = new SendNotification(AddOrEditeOrderActivity.this, getReciverName(usersList.get(i)), data);
+                                                                        Data data = new Data("new order", "تم تعديل اوردر خاص بك (" + placeVal + " - " + locationVal + "(", "order");
+                                                                        SendNotification send = new SendNotification(AddOrEditeOrderActivity.this,  usersList.get(i) , data);
                                                                     }
                                                                 }
 
@@ -434,7 +439,7 @@ public class AddOrEditeOrderActivity extends AppCompatActivity {
     }
 
     private void setUpApi() {
-        Api =getAPIHEADER(AddOrEditeOrderActivity.this)+ "/addOrdersNew.php?"
+        Api = getAPIHEADER(AddOrEditeOrderActivity.this) + "/addOrdersNew.php?"
                 + "place=" + placeVal + "&location=" + locationVal
                 + "&date=" + dateVal + "&time=" + timeVal
                 + "&mater=" + matterVal + "&file=" + filesVal
@@ -444,7 +449,7 @@ public class AddOrEditeOrderActivity extends AppCompatActivity {
             boolean checked = checkedColors[i];
             if (checked) {
                 Api += "&username[]=" + usersList.get(i);
-                Api += "&uid[]=" + getId(usersList.get(i));
+                Api += "&uid[]=" + db.getTokens(usersList.get(i));
             }
         }
     }
@@ -517,7 +522,7 @@ public class AddOrEditeOrderActivity extends AppCompatActivity {
 
     private void extractProgressFromJason() {
 
-        String api =getAPIHEADER(AddOrEditeOrderActivity.this) + "/progress.php?order=" + idUpdated;
+        String api = getAPIHEADER(AddOrEditeOrderActivity.this) + "/progress.php?order=" + idUpdated;
         RequestQueue queue = Volley.newRequestQueue(this);
         StringRequest stringRequest = new StringRequest(Request.Method.GET, api,
                 new Response.Listener<String>() {
@@ -580,30 +585,25 @@ public class AddOrEditeOrderActivity extends AppCompatActivity {
     }
 
 
-    private String getReciverName(String name) {
-        switch (name) {
-            case "Ahmed":
-                return "Ahmed Saleh";
-            case "Barsom":
-                return "Barsom";
-            case "Remon":
-                return "Remon";
-            case "Mohamed":
-                return "Mohamed Hammad";
-        }
-        return "";
-    }
+//    private String getReciverName(String name) {
+//        switch (name) {
+//            case "Ahmed":
+//                return "Ahmed Saleh";
+//            case "Barsom":
+//                return "Barsom";
+//            case "Remon":
+//                return "Remon";
+//            case "Mohamed":
+//                return "Mohamed Hammad";
+//        }
+//        return "";
+//    }
 
     public void setUsersList(View view) {
         usernames.setText("");
         matter.setText("");
         AlertDialog.Builder builder = new AlertDialog.Builder(AddOrEditeOrderActivity.this);
-        String[] colors = new String[]{
-                "Ahmed",
-                "Mohamed",
-                "Remon",
-                "Barsom"
-        };
+        String[] colors = db.getTokens();
 
         checkedColors = new boolean[]{
                 false,
@@ -664,18 +664,18 @@ public class AddOrEditeOrderActivity extends AppCompatActivity {
         dialog.show();
     }
 
-    private String getId(String s) {
-        switch (s) {
-            case "Ahmed":
-                return "3grT34bqUdSG4WHVYFRuxDaIm1I3";
-            case "Mohamed":
-                return "aRisjHAS36R5qrvXgAO8fpNIiLE3";
-            case "Remon":
-                return "xHIE6dwSIwQB8rm3geTBzfJdN0r2";
-            case "Barsom":
-                return "poP0PGB5bpSoXYegmkTUOodDqjB2";
-        }
-        return "";
-    }
+//    private String getId(String s) {
+//        switch (s) {
+//            case "Ahmed":
+//                return "3grT34bqUdSG4WHVYFRuxDaIm1I3";
+//            case "Mohamed":
+//                return "aRisjHAS36R5qrvXgAO8fpNIiLE3";
+//            case "Remon":
+//                return "xHIE6dwSIwQB8rm3geTBzfJdN0r2";
+//            case "Barsom":
+//                return "poP0PGB5bpSoXYegmkTUOodDqjB2";
+//        }
+//        return "";
+//    }
 
 }

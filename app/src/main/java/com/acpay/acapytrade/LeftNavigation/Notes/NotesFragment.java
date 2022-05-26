@@ -341,14 +341,15 @@ public class NotesFragment extends Fragment {
                     List<NotesPlacesDetails> comments = new ArrayList<>();
                     for (int x = 0; x < transitionssa.length(); x++) {
                         JSONObject transitionsjsonArrayId = transitionsjsonObject.getJSONObject(transitionssa.get(x).toString());
-                        comments.add(new NotesPlacesDetails(transitionsjsonArrayId.getString("id")
+                        comments.add(new NotesPlacesDetails(
+                                transitionsjsonArrayId.getString("id")
                                 , transitionsjsonArrayId.getString("name")
                                 , transitionsjsonArrayId.getString("type")
                                 , transitionsjsonArrayId.getString("model")
                                 , transitionsjsonArrayId.getString("details")
                                 , transitionsjsonArrayId.getString("ip")
                                 , transitionsjsonArrayId.getString("username")
-                                , transitionsjsonArrayId.getString("password")
+                                , transitionsjsonArrayId.has("password")?transitionsjsonArrayId.getString("password"):""
                                 , transitionsjsonArrayId.getString("port")
                                 , transitionsjsonArrayId.getString("email")
                                 , transitionsjsonArrayId.getString("email_pass")));

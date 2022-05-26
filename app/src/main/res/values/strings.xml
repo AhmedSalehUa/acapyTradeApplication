@@ -118,4 +118,6 @@
     <string name="deivceEmailPassword">E-Mail Password</string>
     <string name="lef_nav_static_ip">Static Ip</string>
     <string name="lef_nav_sales">Sales</string>
+    <string name="username">Name</string>
+    <string name="tokken">Tokken</string>
 </resources>

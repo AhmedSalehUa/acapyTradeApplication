@@ -8,6 +8,10 @@ public class TransitionsName {
         this.name = name;
     }
 
+    public TransitionsName() {
+
+    }
+
     public String getName() {
         return name;
     }
