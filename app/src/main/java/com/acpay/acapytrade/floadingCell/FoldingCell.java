@@ -1,4 +1,4 @@
-package com.acpay.acapytrade.floadingCell;
+package com.acpay.acapytrade.FloadingCell;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -18,10 +18,10 @@ import android.widget.RelativeLayout;
 import androidx.core.view.ViewCompat;
 
 import com.acpay.acapytrade.R;
-import com.acpay.acapytrade.floadingCell.animations.AnimationEndListener;
-import com.acpay.acapytrade.floadingCell.animations.FoldAnimation;
-import com.acpay.acapytrade.floadingCell.animations.HeightAnimation;
-import com.acpay.acapytrade.floadingCell.views.FoldingCellView;
+import com.acpay.acapytrade.FloadingCell.animations.AnimationEndListener;
+import com.acpay.acapytrade.FloadingCell.animations.FoldAnimation;
+import com.acpay.acapytrade.FloadingCell.animations.HeightAnimation;
+import com.acpay.acapytrade.FloadingCell.views.FoldingCellView;
 
 import java.util.ArrayList;
 import java.util.Collections;

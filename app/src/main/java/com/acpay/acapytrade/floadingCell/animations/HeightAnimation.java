@@ -1,4 +1,4 @@
-package com.acpay.acapytrade.floadingCell.animations;
+package com.acpay.acapytrade.FloadingCell.animations;
 
 import android.view.View;
 import android.view.animation.Animation;

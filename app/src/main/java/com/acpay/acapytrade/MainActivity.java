@@ -4,7 +4,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -12,28 +11,38 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import android.Manifest;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-import com.acpay.acapytrade.Networking.JasonReponser;
-import com.acpay.acapytrade.fragments.CostFragment;
-import com.acpay.acapytrade.fragments.HomeFragment;
-import com.acpay.acapytrade.fragments.Locations.LocationFragment;
-import com.acpay.acapytrade.fragments.messages.MessegeFragment;
-import com.acpay.acapytrade.fragments.OrderFragment;
-import com.firebase.ui.auth.AuthUI;
+import com.acpay.acapytrade.BackgroundMessegesReciver.BackgroundMessegesReciver;
+import com.acpay.acapytrade.Navigations.CostFragment;
+import com.acpay.acapytrade.Navigations.HomeFragment;
+import com.acpay.acapytrade.Navigations.Locations.LocationFragment;
+import com.acpay.acapytrade.Navigations.OrderDeleted;
+import com.acpay.acapytrade.Navigations.messages.MessegeChildsFragment;
+import com.acpay.acapytrade.Navigations.messages.MessegeFragment;
+import com.acpay.acapytrade.Navigations.OrderFragment;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.snackbar.BaseTransientBottomBar;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.MultiplePermissionsReport;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
+
+import java.util.Arrays;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity  implements NavigationView.OnNavigationItemSelectedListener{
     private BottomNavigationView bottomNav;
@@ -44,6 +53,19 @@ public class MainActivity extends AppCompatActivity  implements NavigationView.O
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Dexter.withActivity(this).withPermissions(Arrays.asList(Manifest.permission.FOREGROUND_SERVICE,Manifest.permission.ACCESS_FINE_LOCATION)).withListener(new MultiplePermissionsListener() {
+            @Override
+            public void onPermissionsChecked(MultiplePermissionsReport report) {
+                Log.e("permission ok","ok");
+            }
+
+            @Override
+            public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
+                Snackbar.make(findViewById(android.R.id.content),"Permissions Denied", Snackbar.LENGTH_SHORT).show();
+            }
+        }).check();
+        Intent serviceIntent = new Intent(this, BackgroundMessegesReciver.class);
+        ContextCompat.startForegroundService(this, serviceIntent);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -133,6 +155,7 @@ public class MainActivity extends AppCompatActivity  implements NavigationView.O
                 startActivity(intent);
                 return true;
             case R.id.deleted_order:
+
                 Intent intent2 = new Intent(MainActivity.this, DeletedActivity.class);
                 startActivity(intent2);
                 return true;

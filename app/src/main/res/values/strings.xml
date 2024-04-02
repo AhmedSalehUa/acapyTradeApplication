@@ -85,4 +85,10 @@
     <string name="date_from">الفترة من</string>
     <string name="date_to">الفترة الى</string>
     <string name="show">عرض</string>
+    <string name="progress_name">خطوات</string>
+    <string name="noProgress">لا يوجد خطوات</string>
+    <string name="label">ملاحظات</string>
+    <string name="content_description_end_icon">ملاحظات</string>
+    <string name="request_btn_cost_text">تفعيل</string>
+    <string name="request_btn_edite">تعديل</string>
 </resources>

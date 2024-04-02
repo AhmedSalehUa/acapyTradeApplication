@@ -28,7 +28,6 @@ import androidx.loader.content.Loader;
 import com.acpay.acapytrade.AddOrderActivity;
 import com.acpay.acapytrade.PendingRequests;
 import com.acpay.acapytrade.R;
-import com.acpay.acapytrade.floadingCell.FoldingCell;
 import com.acpay.acapytrade.oreder.Order;
 import com.acpay.acapytrade.oreder.OrderAdapter;
 import com.acpay.acapytrade.oreder.OrderDone;
