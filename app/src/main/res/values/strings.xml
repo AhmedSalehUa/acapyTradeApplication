@@ -91,4 +91,36 @@
     <string name="content_description_end_icon">ملاحظات</string>
     <string name="request_btn_cost_text">تفعيل</string>
     <string name="request_btn_edite">تعديل</string>
+<<<<<<< HEAD
+=======
+    <string name="left_nav_group">Other</string>
+    <string name="lef_nav_ip">ip search</string>
+    <string name="lef_nav_notes">Notes</string>
+    <string name="nav_transitions_names">Names</string>
+    <string name="nav_transitions_pay">Pay</string>
+    <string name="nav_transitions_paied">Done</string>
+    <string name="tarnsition_content_pay">Pay</string>
+    <string name="tarnsition_content_unpay">" back out of payment"</string>
+    <string name="choose">choose</string>
+    <string name="nav_notes_places">Places</string>
+    <string name="nav_notes_devices">Devices</string>
+    <string name="nav_notes_details">Details</string>
+    <string name="addPlace_name">Place Name</string>
+    <string name="addPlace_location">Place Location</string>
+    <string name="addPlace_details">Details</string>
+    <string name="deivceName">Device Name</string>
+    <string name="deivceType">Device Type</string>
+    <string name="deivceModel">Device Model</string>
+    <string name="deivceDetails">Device Details</string>
+    <string name="deivceIp">IP</string>
+    <string name="deivcePort">Port</string>
+    <string name="deivceUsername">UserName</string>
+    <string name="deivcePassword">Password</string>
+    <string name="deivceEmail">E-Mail</string>
+    <string name="deivceEmailPassword">E-Mail Password</string>
+    <string name="lef_nav_static_ip">Static Ip</string>
+    <string name="lef_nav_sales">Sales</string>
+    <string name="username">Name</string>
+    <string name="tokken">Tokken</string>
+>>>>>>> 4d8adbf7f1e4ccbed605560ec2c90d1b8bdba1f1
 </resources>

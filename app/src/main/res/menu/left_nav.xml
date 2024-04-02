@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-
+    <group android:checkableBehavior="single">
         <item
             android:id="@+id/lef_nav_home"
             android:icon="@drawable/ic_baseline_home_24"
@@ -10,7 +10,29 @@
             android:id="@+id/lef_nav_cost"
             android:icon="@drawable/ic_baseline_attach_money_24"
             android:title="@string/lef_nav_cost" />
-
+    </group>
+    <item android:title="@string/left_nav_group">
+        <menu>
+            <group android:checkableBehavior="single">
+                <item
+                    android:id="@+id/lef_nav_ip"
+                    android:icon="@drawable/ic_baseline_network_check_24"
+                    android:title="@string/lef_nav_ip" />
+                <item
+                    android:id="@+id/lef_nav_notes"
+                    android:icon="@drawable/ic_baseline_note_add_24"
+                    android:title="@string/lef_nav_notes" />
+                <item
+                    android:id="@+id/lef_nav_static_ip"
+                    android:icon="@drawable/ic_action_name"
+                    android:title="@string/lef_nav_static_ip" />
+                <item
+                    android:id="@+id/lef_nav_sales"
+                    android:icon="@drawable/ic_sales"
+                    android:title="@string/lef_nav_sales" />
+            </group>
+        </menu>
+    </item>
 
 
 </menu>

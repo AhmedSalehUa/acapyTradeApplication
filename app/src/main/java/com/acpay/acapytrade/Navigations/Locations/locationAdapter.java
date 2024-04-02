@@ -35,10 +35,16 @@ public class locationAdapter extends ArrayAdapter<location> {
         userName.setText(fristChar);
 
         TextView latitude = (TextView)listItemView.findViewById(R.id.latitude);
+<<<<<<< HEAD
         latitude.setText(location.getLatitude());
 
         TextView Longlatitude = (TextView)listItemView.findViewById(R.id.longtitude);
         Longlatitude.setText(location.getLonglatitude());
+=======
+        latitude.setText(fullUserNAme);
+
+
+>>>>>>> 4d8adbf7f1e4ccbed605560ec2c90d1b8bdba1f1
 
         TextView date = (TextView)listItemView.findViewById(R.id.Date);
         TextView time = (TextView)listItemView.findViewById(R.id.Time);

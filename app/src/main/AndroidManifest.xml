@@ -2,14 +2,20 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.acpay.acapytrade">
 
+<<<<<<< HEAD
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+=======
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+>>>>>>> 4d8adbf7f1e4ccbed605560ec2c90d1b8bdba1f1
 
     <application
         android:allowBackup="true"
         android:icon="@drawable/appbackground"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
+        android:usesCleartextTraffic="true"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
@@ -37,8 +43,8 @@
         </activity>
         <activity
             android:name=".MainActivity"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:label="@string/MainActivity"/>
+            android:label="@string/MainActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".AddOrEditeOrderActivity"
             android:theme="@style/EditorTheme">
@@ -47,13 +53,19 @@
                 android:value=".MainActivity" />
         </activity>
         <activity
-        android:name=".PendingRequests"
-        android:label="@string/pending_requests"
-        android:theme="@style/EditorTheme">
-        <meta-data
-            android:name="android.support.PARENT_ACTIVITY"
-            android:value=".MainActivity" />
-         </activity>
+            android:name=".LeftNavigation.Notes.AddPlace"
+            android:theme="@style/EditorTheme"/>
+        <activity
+            android:name=".LeftNavigation.Notes.AddDevice"
+            android:theme="@style/EditorTheme"/>
+        <activity
+            android:name=".PendingRequests"
+            android:label="@string/pending_requests"
+            android:theme="@style/EditorTheme">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
         <activity
             android:name=".FinishedActivity"
             android:label="@string/finished_orders"
@@ -95,7 +107,11 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </receiver>
+<<<<<<< HEAD
         <service android:name=".BackgroundMessegesReciver.BackgroundMessegesReciver"/>
+=======
+
+>>>>>>> 4d8adbf7f1e4ccbed605560ec2c90d1b8bdba1f1
     </application>
 
 </manifest>

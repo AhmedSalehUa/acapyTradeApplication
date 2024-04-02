@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:ec="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+     android:layout_width="match_parent"
+    android:layout_height="match_parent"
+
+    android:clipChildren="false">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipChildren="true">
+
+        <ProgressBar
+            android:id="@+id/notesProgress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true" />
+
+        <com.acpay.acapytrade.Cordinations.ECBackgroundSwitcherView
+            android:id="@+id/ec_bg_switcher_element"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <com.acpay.acapytrade.Cordinations.ItemsCountView
+            android:id="@+id/items_count_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="120dp"
+            android:clipChildren="false"
+            android:orientation="horizontal" />
+
+        <com.acpay.acapytrade.Cordinations.ECPagerView
+            android:id="@+id/ec_pager_element"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="250dp"
+            ec:cardHeaderHeightExpanded="200dp"
+            ec:cardHeight="250dp"
+            ec:cardWidth="250dp" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/notesPlacesListAdd"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:layout_margin="30dp"
+            android:src="@drawable/ic_baseline_airplay_24" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/notesPlacesListAddDetails"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:layout_margin="30dp"
+            android:src="@drawable/ic_baseline_apartment_24" />
+    </RelativeLayout>
+</LinearLayout>

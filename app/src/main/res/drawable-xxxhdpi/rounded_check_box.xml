@@ -2,5 +2,9 @@
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
     <solid android:color="@android:color/holo_blue_dark"/>
     <size android:height="50dp"/>
+<<<<<<< HEAD
 <corners android:bottomLeftRadius="20dp" android:topLeftRadius="20dp"/>
+=======
+<corners android:bottomRightRadius="20dp" android:topRightRadius="20dp"/>
+>>>>>>> 4d8adbf7f1e4ccbed605560ec2c90d1b8bdba1f1
 </shape>

@@ -27,6 +27,7 @@ public class locationUtilies {
         super();
     }
 
+<<<<<<< HEAD
     public static List<location> fetchData(String url) {
         URL urlR = getUrl(url);
         String jasonResponse = null;
@@ -38,6 +39,9 @@ public class locationUtilies {
         List<location> books = extractFeuterFromJason(jasonResponse);
         return books;
     }
+=======
+
+>>>>>>> 4d8adbf7f1e4ccbed605560ec2c90d1b8bdba1f1
 
     public static List<location> extractFeuterFromJason(String jason) {
         final List<location> list = new ArrayList<>();

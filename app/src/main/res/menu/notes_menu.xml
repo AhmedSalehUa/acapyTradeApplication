@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    android:clickable="false"
+    android:contextClickable="false">
+
+    <item
+        android:id="@+id/nav_notes_places"
+        android:icon="@drawable/ic_baseline_apartment_24"
+        android:title="@string/nav_notes_places"/>
+    <item
+        android:id="@+id/nav_notes_devices"
+        android:icon="@drawable/ic_baseline_airplay_24"
+        android:title="@string/nav_notes_devices"/>
+    <item
+        android:id="@+id/nav_notes_details"
+        android:icon="@drawable/ic_baseline_format_align_left_24"
+        android:title="@string/nav_notes_details"/>
+
+</menu>

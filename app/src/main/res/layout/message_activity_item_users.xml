@@ -2,6 +2,11 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="80dp"
+<<<<<<< HEAD
+=======
+    android:id="@+id/userLatout"
+
+>>>>>>> 4d8adbf7f1e4ccbed605560ec2c90d1b8bdba1f1
     android:orientation="horizontal">
 
     <RelativeLayout
@@ -23,6 +28,7 @@
             android:textAllCaps="true"
             android:textColor="@android:color/black"
             android:textSize="25sp" />
+
     </RelativeLayout>
 
     <RelativeLayout
@@ -36,5 +42,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true" />
+<<<<<<< HEAD
+=======
+
+        <TextView
+            android:id="@+id/last_msg"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/message_user_name" />
+>>>>>>> 4d8adbf7f1e4ccbed605560ec2c90d1b8bdba1f1
     </RelativeLayout>
 </LinearLayout>
