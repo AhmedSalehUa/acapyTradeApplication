@@ -13,12 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.acpay.acapytrade.Navigations.messages;
+package com.acpay.acapytrade.Navigations.Messages;
 
 public class MessageUsers {
 
     private String name;
-
     public MessageUsers() {
     }
 
@@ -33,5 +32,6 @@ public class MessageUsers {
     public void setName(String name) {
         this.name = name;
     }
+
 
 }

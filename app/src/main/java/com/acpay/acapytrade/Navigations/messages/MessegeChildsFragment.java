@@ -1,8 +1,10 @@
-package com.acpay.acapytrade.Navigations.messages;
+package com.acpay.acapytrade.Navigations.Messages;
 
 import android.app.Activity;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -13,8 +15,11 @@ import android.text.InputFilter;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -24,10 +29,19 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationCompat;
 import androidx.fragment.app.Fragment;
 
+import com.acpay.acapytrade.Navigations.Messages.sendNotification.APIService;
+import com.acpay.acapytrade.Navigations.Messages.sendNotification.Client;
+import com.acpay.acapytrade.Navigations.Messages.sendNotification.Data;
+import com.acpay.acapytrade.Navigations.Messages.sendNotification.MyResponse;
+import com.acpay.acapytrade.Navigations.Messages.sendNotification.Sender;
+import com.acpay.acapytrade.Navigations.Messages.sendNotification.Token;
 import com.acpay.acapytrade.R;
+import com.acpay.acapytrade.SendNotification;
+import com.acpay.acapytrade.Tokens;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -48,19 +62,26 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MessegeChildsFragment extends Fragment {
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mDatabaseReference;
-
+    Tokens tok;
 
     private FirebaseStorage mFirebaseStorage;
     private StorageReference mChatPhotosStorageReference;
     private ChildEventListener mChildEventListener;
-
+    FirebaseUser user;
     private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
+    ValueEventListener seenListener;
 
     private static final String TAG = "MessegeFragment";
 
@@ -79,10 +100,11 @@ public class MessegeChildsFragment extends Fragment {
 
     private static final int RC_PHOTO_PICKER = 2;
     public static final int RC_SIGN_IN = 1;
-
+    APIService apiService;
     private String targetUserName;
     String DateNow;
     String TimeNow;
+
     public MessegeChildsFragment(String username) {
         super();
         this.targetUserName = username;
@@ -98,8 +120,8 @@ public class MessegeChildsFragment extends Fragment {
         mFirebaseStorage = FirebaseStorage.getInstance();
         mDatabaseReference = mFirebaseDatabase.getReference().child("messages").child(targetUserName);
         mChatPhotosStorageReference = mFirebaseStorage.getReference().child("chat_photo");
-        FirebaseUser user = mFirebaseAuth.getCurrentUser();
-
+        user = mFirebaseAuth.getCurrentUser();
+        apiService = Client.getClient("https://fcm.googleapis.com/").create(APIService.class);
         mProgressBar = (ProgressBar) rootView.findViewById(R.id.progressBar);
         mMessageListView = (ListView) rootView.findViewById(R.id.messageListView);
         mPhotoPickerButton = (ImageButton) rootView.findViewById(R.id.photoPickerButton);
@@ -146,11 +168,13 @@ public class MessegeChildsFragment extends Fragment {
         mSendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                DateNow = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
-                TimeNow = new SimpleDateFormat("hh:mm").format(new Date());
-                Message friendlyMessage = new Message(mMessageEditText.getText().toString(), mUsername, null,DateNow,TimeNow);
+                DateNow = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH).format(new Date());
+                TimeNow = new SimpleDateFormat("hh:mm", Locale.ENGLISH).format(new Date());
+                Message friendlyMessage = new Message(mMessageEditText.getText().toString(), mUsername, null, DateNow, TimeNow, false);
                 mDatabaseReference.push().setValue(friendlyMessage);
-                mMessageEditText.setText("");
+                Data data =new Data( mUsername, mMessageEditText.getText().toString(),"message");
+                SendNotification send = new SendNotification(getContext(),targetUserName,data);
+                 mMessageEditText.setText("");
             }
         });
 
@@ -178,7 +202,52 @@ public class MessegeChildsFragment extends Fragment {
         List<Message> friendlyMessages = new ArrayList<>();
         mMessageAdapter = new MessageAdapter(getContext(), R.layout.message_activity_item, friendlyMessages, user.getDisplayName());
         mMessageListView.setAdapter(mMessageAdapter);
+        mMessageListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Message message = mMessageAdapter.getItem(i);
+                ClipboardManager clipboardManager = (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
+                ClipData clipData = ClipData.newPlainText("message", message.getText());
+                clipboardManager.setPrimaryClip(clipData);
+                Toast.makeText(getContext(), "Copied", Toast.LENGTH_SHORT).show();
+                return false;
+            }
+        });
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Messages");
+        setHasOptionsMenu(true);
+        seenMessage();
         return rootView;
+    }
+
+    private void seenMessage() {
+        if (user.getDisplayName().equals("Ahmed Saleh")) {
+
+        } else {
+            seenListener = mDatabaseReference.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                        Message chat = snapshot.getValue(Message.class);
+                        if (!chat.getName().equals(mUsername)) {
+                            HashMap<String, Object> hashMap = new HashMap<>();
+                            hashMap.put("seen", true);
+                            snapshot.getRef().updateChildren(hashMap);
+                        }
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+        }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        menu.clear();
     }
 
     @Override
@@ -214,9 +283,11 @@ public class MessegeChildsFragment extends Fragment {
                                 @Override
                                 public void onSuccess(Uri uri) {
                                     String imageUrl = uri.toString();
-                                    DateNow = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
-                                    TimeNow = new SimpleDateFormat("hh:mm").format(new Date());
-                                    Message friendlyMessage = new Message(null, mUsername, imageUrl,DateNow,TimeNow);
+                                    DateNow = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH).format(new Date());
+                                    TimeNow = new SimpleDateFormat("hh:mm", Locale.ENGLISH).format(new Date());
+                                    Message friendlyMessage = new Message(null, mUsername, imageUrl, DateNow, TimeNow, false);
+                                    Data data1=new Data( mUsername, "photo","message");
+                                    SendNotification send = new SendNotification(getContext(),targetUserName,data1);
                                     mDatabaseReference.push().setValue(friendlyMessage);
                                 }
                             });
@@ -248,22 +319,14 @@ public class MessegeChildsFragment extends Fragment {
             @Override
             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
                 Message message = snapshot.getValue(Message.class);
-                if (message.getName() == mUsername) {
 
-                } else {
-                    notifyME(message.getName(), message.getText());
-                }
                 mMessageAdapter.add(message);
             }
 
             @Override
             public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
                 Message message = snapshot.getValue(Message.class);
-                if (message.getName() == mUsername) {
 
-                } else {
-                    notifyME(message.getName(), message.getText());
-                }
 
             }
 
@@ -282,28 +345,6 @@ public class MessegeChildsFragment extends Fragment {
         mDatabaseReference.addChildEventListener(mChildEventListener);
     }
 
-    private void notifyME(String sender, String message) {
-        NotificationCompat.Builder notificationBuilder =
-                new NotificationCompat.Builder(getContext(), "0")
-                        .setSmallIcon(R.drawable.ic_stat_ic_notification)
-                        .setContentTitle(sender)
-                        .setContentText(message)
-                        .setAutoCancel(true);
-
-        NotificationManager notificationManager =
-                (NotificationManager) getContext().getSystemService(Context.NOTIFICATION_SERVICE);
-
-        // Since android Oreo notification channel is needed.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel("0",
-                    "Channel human readable title",
-                    NotificationManager.IMPORTANCE_DEFAULT);
-            notificationManager.createNotificationChannel(channel);
-        }
-
-        notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());
-    }
-
     private void clearUpChats() {
         mUsername = ANONYMOUS;
         mMessageAdapter.clear();
@@ -320,5 +361,6 @@ public class MessegeChildsFragment extends Fragment {
         super.onPause();
 
     }
+
 
 }
